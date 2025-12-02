@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using bomb.bomb;
 
 namespace bomb
 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     public partial class Form1 : Form
     {
@@ -31,6 +31,10 @@ namespace bomb
 =======
    
     public partial class Form1 : Form
+=======
+    
+        public partial class Form1 : Form
+>>>>>>> parent of fb0fbd9 (操作方法)
         {
             private Timer gameTimer;
             private GameBoard board;
@@ -65,14 +69,8 @@ namespace bomb
                 this.Invalidate(); // 再描画
             }
 
-        private void Form1_KeyDow(object sender, KeyEventArgs e) // ← KeyDown に修正
-        {
-            // 矢印キー
-            if (e.KeyCode == Keys.Up) board.Player.Move(0, -1);
-            if (e.KeyCode == Keys.Down) board.Player.Move(0, 1);
-            if (e.KeyCode == Keys.Left) board.Player.Move(-1, 0);
-            if (e.KeyCode == Keys.Right) board.Player.Move(1, 0);
 
+<<<<<<< HEAD
             // WASDキー
             if (e.KeyCode == Keys.W) board.Player.Move(0, -1);
             if (e.KeyCode == Keys.S) board.Player.Move(0, 1);
@@ -84,11 +82,11 @@ namespace bomb
 
             Invalidate(); // 再描画
 >>>>>>> origin/master
+=======
+>>>>>>> parent of fb0fbd9 (操作方法)
         }
-    }
 
-
-
+<<<<<<< HEAD
 <<<<<<< HEAD
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -123,4 +121,7 @@ namespace bomb
     }
 =======
 >>>>>>> origin/master
+=======
+    
+>>>>>>> parent of fb0fbd9 (操作方法)
 }
