@@ -7,11 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using bomb.bomb;
 
 namespace bomb
 {
-    
-        public partial class Form1 : Form
+   
+    public partial class Form1 : Form
         {
             private Timer gameTimer;
             private GameBoard board;
@@ -46,8 +47,27 @@ namespace bomb
                 this.Invalidate(); // 再描画
             }
 
+        private void Form1_KeyDow(object sender, KeyEventArgs e) // ← KeyDown に修正
+        {
+            // 矢印キー
+            if (e.KeyCode == Keys.Up) board.Player.Move(0, -1);
+            if (e.KeyCode == Keys.Down) board.Player.Move(0, 1);
+            if (e.KeyCode == Keys.Left) board.Player.Move(-1, 0);
+            if (e.KeyCode == Keys.Right) board.Player.Move(1, 0);
 
+            // WASDキー
+            if (e.KeyCode == Keys.W) board.Player.Move(0, -1);
+            if (e.KeyCode == Keys.S) board.Player.Move(0, 1);
+            if (e.KeyCode == Keys.A) board.Player.Move(-1, 0);
+            if (e.KeyCode == Keys.D) board.Player.Move(1, 0);
+
+            // スペースで爆弾設置
+            if (e.KeyCode == Keys.Space) board.PlaceBomb();
+
+            Invalidate(); // 再描画
         }
+    }
 
-    
+
+
 }
