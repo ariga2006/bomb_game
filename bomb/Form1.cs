@@ -8,69 +8,44 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace bomb
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
     public partial class Form1 : Form
     {
         private Timer gameTimer;
         private GameBoard board;
 
-        public Form1()
+            public Form1()
         {
             InitializeComponent();
-            this.Load += Form1_Load; // ← これが必要！
+
+            this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.KeyDown += Form1_KeyDown;
+
+            board = new GameBoard(15, 15); // ← ここで初期化
 
             gameTimer = new Timer();
             gameTimer.Interval = 100;
             gameTimer.Tick += GameTimer_Tick;
             gameTimer.Start();
-=======
-   
-    public partial class Form1 : Form
-=======
-    
-        public partial class Form1 : Form
->>>>>>> parent of fb0fbd9 (操作方法)
+        }
+        
+
+        private void Form1_Load(object sender, EventArgs e)
         {
-            private Timer gameTimer;
-            private GameBoard board;
-            private Player player;
+            board = new GameBoard(15, 15); // 幅と高さを渡す
+        }
 
-            public Form1()
-            {
-                InitializeComponent();
-                this.KeyPreview = true;
-                this.KeyDown += Form1_KeyDown;
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            // 矢印キー
+            if (e.KeyCode == Keys.Up) board.Player.Move(0, -1);
+            if (e.KeyCode == Keys.Down) board.Player.Move(0, 1);
+            if (e.KeyCode == Keys.Left) board.Player.Move(-1, 0);
+            if (e.KeyCode == Keys.Right) board.Player.Move(1, 0);
 
-                gameTimer = new Timer();
-                gameTimer.Interval = 100; // 0.1秒ごとに更新
-                gameTimer.Tick += GameTimer_Tick;
-                gameTimer.Start();
-            }
-
-            private void Form1_Load(object sender, EventArgs e)
-            {
-                board = new GameBoard(15, 15); // ← 幅と高さを渡す
-                player = new Player(1, 1);     // ← Player も初期位置を渡すと良い
-            }
-
-            private void Form1_KeyDown(object sender, KeyEventArgs e)
-            {
-                // 矢印キーで移動、スペースで爆弾設置
-            }
-
-            private void GameTimer_Tick(object sender, EventArgs e)
-            {
-                // 爆弾タイマーや敵の動きを更新
-                this.Invalidate(); // 再描画
-            }
-
-
-<<<<<<< HEAD
             // WASDキー
             if (e.KeyCode == Keys.W) board.Player.Move(0, -1);
             if (e.KeyCode == Keys.S) board.Player.Move(0, 1);
@@ -81,27 +56,6 @@ namespace bomb
             if (e.KeyCode == Keys.Space) board.PlaceBomb();
 
             Invalidate(); // 再描画
->>>>>>> origin/master
-=======
->>>>>>> parent of fb0fbd9 (操作方法)
-        }
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            board = new GameBoard(15, 15);
-        }
-
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Up) board.Player.Move(0, -1);
-            if (e.KeyCode == Keys.Down) board.Player.Move(0, 1);
-            if (e.KeyCode == Keys.Left) board.Player.Move(-1, 0);
-            if (e.KeyCode == Keys.Right) board.Player.Move(1, 0);
-            if (e.KeyCode == Keys.Space) board.PlaceBomb();
-
-            this.Invalidate();
         }
 
         private void GameTimer_Tick(object sender, EventArgs e)
@@ -119,9 +73,4 @@ namespace bomb
             }
         }
     }
-=======
->>>>>>> origin/master
-=======
-    
->>>>>>> parent of fb0fbd9 (操作方法)
 }
