@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using bomb.bomb;
 
 namespace bomb
 {
@@ -66,8 +65,5 @@ namespace bomb
 
             Invalidate(); // 再描画
         }
-    }
-
-
 
 }
