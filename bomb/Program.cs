@@ -18,7 +18,7 @@ namespace bomb
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
 
-            Console.WriteLine("テスト");
+            Console.WriteLine("テスト2");
         }
     }
    
