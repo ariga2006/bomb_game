@@ -18,7 +18,11 @@ namespace bomb
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
 
+<<<<<<< HEAD
             Console.WriteLine("テスト2");
+=======
+            Console.WriteLine("テスト");
+>>>>>>> 6eb5fd9 (Revert "ぼむ")
         }
     }
    

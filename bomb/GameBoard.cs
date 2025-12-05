@@ -56,15 +56,22 @@ namespace bomb
 
         public void Update()
         {
-            // 爆弾更新
+            // --- 爆弾更新 ---
             for (int i = bombs.Count - 1; i >= 0; i--)
             {
-                if (bombs[i].Tick())
+                var bomb = bombs[i];
+                if (bomb == null) { bombs.RemoveAt(i); continue; }
+
+                bomb.Tick();                  // 状態だけ更新
+                if (bomb.IsFinished())        // 終了判定は別メソッド
+                {
                     bombs.RemoveAt(i);
+                }
             }
 
+            // --- 敵の移動 ---
             enemyTickCounter++;
-            if (enemyTickCounter >= 5) // 5Tickごとに移動
+            if (enemyTickCounter >= 5)
             {
                 enemyTickCounter = 0;
                 foreach (var enemy in enemies)
@@ -72,7 +79,6 @@ namespace bomb
                     enemy.Move(this);
                 }
             }
-
         }
 
 
@@ -93,7 +99,7 @@ namespace bomb
             // プレイヤー描画
             Player.Draw(g, cellSize);
 
-            // 爆弾描画
+            // 爆弾 or 爆風描画
             foreach (var bomb in bombs)
             {
                 bomb.Draw(g, cellSize);
@@ -104,5 +110,6 @@ namespace bomb
                 enemy.Draw(g, cellSize);
             }
         }
+
     }
-}
+    }

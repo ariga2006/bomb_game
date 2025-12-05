@@ -17,15 +17,18 @@ namespace bomb
 
         public Form1()
         {
+
             InitializeComponent();
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.KeyDown += Form1_KeyDown;
 
+
             gameTimer = new Timer();
             gameTimer.Interval = 100;
             gameTimer.Tick += GameTimer_Tick;
             gameTimer.Start();
+
 
             board = new GameBoard(20,20); // 15×15の盤面
         }
@@ -49,11 +52,13 @@ namespace bomb
             if (e.KeyCode == Keys.Space) board.PlaceBomb();
 
             Invalidate();
+
         }
 
         private void GameTimer_Tick(object sender, EventArgs e)
         {
             board.Update();
+
             Invalidate();
         }
 
@@ -67,3 +72,4 @@ namespace bomb
         }
     }
 }
+
