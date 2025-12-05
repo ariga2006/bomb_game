@@ -52,9 +52,10 @@ namespace bomb
         {
             for (int i = bombs.Count - 1; i >= 0; i--)
             {
-                if (bombs[i].Tick())
+                bombs[i].Tick();
+                if (bombs[i].IsFinished())
                 {
-                    bombs.RemoveAt(i);
+                    bombs.RemoveAt(i); // 爆風表示が終わったら削除
                 }
             }
         }
@@ -76,11 +77,12 @@ namespace bomb
             // プレイヤー描画
             Player.Draw(g, cellSize);
 
-            // 爆弾描画
+            // 爆弾 or 爆風描画
             foreach (var bomb in bombs)
             {
                 bomb.Draw(g, cellSize);
             }
         }
+
     }
-}
+    }
