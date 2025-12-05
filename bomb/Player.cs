@@ -7,6 +7,7 @@ using System.Drawing;
 
 namespace bomb
 {
+    // (´・ω:;.:...
     public partial class Player
     {
         public int X { get; set; }
