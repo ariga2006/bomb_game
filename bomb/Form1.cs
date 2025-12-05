@@ -8,45 +8,37 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace bomb
 {
-   
     public partial class Form1 : Form
+    {
+        private Timer gameTimer;
+        private GameBoard board;
+
+        public Form1()
         {
-            private Timer gameTimer;
-            private GameBoard board;
-            private Player player;
+            InitializeComponent();
 
-            public Form1()
-            {
-                InitializeComponent();
-                this.KeyPreview = true;
-                this.KeyDown += Form1_KeyDown;
+            this.DoubleBuffered = true;
+            this.KeyPreview = true;
+            this.KeyDown += Form1_KeyDown;
 
-                gameTimer = new Timer();
-                gameTimer.Interval = 100; // 0.1秒ごとに更新
-                gameTimer.Tick += GameTimer_Tick;
-                gameTimer.Start();
-            }
+            board = new GameBoard(15, 15); // ← ここで初期化
 
-            private void Form1_Load(object sender, EventArgs e)
-            {
-                board = new GameBoard(15, 15); // ← 幅と高さを渡す
-                player = new Player(1, 1);     // ← Player も初期位置を渡すと良い
-            }
+            gameTimer = new Timer();
+            gameTimer.Interval = 100;
+            gameTimer.Tick += GameTimer_Tick;
+            gameTimer.Start();
+        }
+        
 
-            private void Form1_KeyDown(object sender, KeyEventArgs e)
-            {
-                // 矢印キーで移動、スペースで爆弾設置
-            }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            board = new GameBoard(15, 15); // 幅と高さを渡す
+        }
 
-            private void GameTimer_Tick(object sender, EventArgs e)
-            {
-                // 爆弾タイマーや敵の動きを更新
-                this.Invalidate(); // 再描画
-            }
-
-        private void Form1_KeyDow(object sender, KeyEventArgs e) // ← KeyDown に修正
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             // 矢印キー
             if (e.KeyCode == Keys.Up) board.Player.Move(0, -1);
@@ -66,4 +58,20 @@ namespace bomb
             Invalidate(); // 再描画
         }
 
+
+        private void GameTimer_Tick(object sender, EventArgs e)
+        {
+            board.Update();
+            this.Invalidate();
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            if (board != null)
+            {
+                board.Draw(e.Graphics);
+            }
+        }
+    }
 }
