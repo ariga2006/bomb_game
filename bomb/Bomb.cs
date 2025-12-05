@@ -5,36 +5,30 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
+
 namespace bomb
 {
-    public partial class Bomb
-        //爆弾の座標
+    public class Bomb
     {
-        public int X { get; }
-        public int Y { get; }
-        
-        //爆弾のタイマー
-        private int timer = 30;
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        private int timer = 20; // Tick回数で寿命管理
 
-        //爆弾を設置した位置
         public Bomb(int x, int y)
         {
             X = x;
             Y = y;
         }
 
-        //爆発の処理
         public bool Tick()
         {
             timer--;
-            return timer <= 0;
+            return timer <= 0; // trueなら爆発終了
         }
 
-        //爆弾の描画(1マスを20ピクセルとする)
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, int cellSize)
         {
-            g.FillEllipse(Brushes.Black, X * 20, Y * 20, 20, 20);
+            g.FillEllipse(Brushes.Red, X * cellSize, Y * cellSize, cellSize, cellSize);
         }
-
     }
 }
