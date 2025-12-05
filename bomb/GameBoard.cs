@@ -12,6 +12,7 @@ namespace bomb
     {
         public Player Player { get; private set; }
         private List<Bomb> bombs;
+        private List<Enemy> enemies;   // ← 敵リスト追加
         private int[,] map; // 盤面データ
         private int cellSize = 30;
 
@@ -19,6 +20,7 @@ namespace bomb
         {
             Player = new Player();
             bombs = new List<Bomb>();
+            enemies = new List<Enemy>();
             map = new int[height, width];
 
             // 外周を壁にする
@@ -36,6 +38,9 @@ namespace bomb
                     }
                 }
             }
+            // 敵を生成（例：2体）
+            enemies.Add(new Enemy(5, 5));
+            enemies.Add(new Enemy(width - 3, height - 3));
         }
 
         public bool IsWall(int x, int y)
@@ -47,17 +52,29 @@ namespace bomb
         {
             bombs.Add(new Bomb(Player.X, Player.Y));
         }
+        private int enemyTickCounter = 0;
 
         public void Update()
         {
+            // 爆弾更新
             for (int i = bombs.Count - 1; i >= 0; i--)
             {
                 if (bombs[i].Tick())
-                {
                     bombs.RemoveAt(i);
+            }
+
+            enemyTickCounter++;
+            if (enemyTickCounter >= 5) // 5Tickごとに移動
+            {
+                enemyTickCounter = 0;
+                foreach (var enemy in enemies)
+                {
+                    enemy.Move(this);
                 }
             }
+
         }
+
 
         public void Draw(Graphics g)
         {
@@ -80,6 +97,11 @@ namespace bomb
             foreach (var bomb in bombs)
             {
                 bomb.Draw(g, cellSize);
+            }
+            // 敵描画 ← ここを追加！
+            foreach (var enemy in enemies)
+            {
+                enemy.Draw(g, cellSize);
             }
         }
     }
