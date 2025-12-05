@@ -16,7 +16,7 @@ namespace bomb
         private Timer gameTimer;
         private GameBoard board;
 
-            public Form1()
+        public Form1()
         {
             InitializeComponent();
 
