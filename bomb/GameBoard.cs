@@ -38,9 +38,10 @@ namespace bomb
                     }
                 }
             }
-            // 敵を生成（例：2体）
-            enemies.Add(new Enemy(5, 5));
-            enemies.Add(new Enemy(width - 3, height - 3));
+            // 敵を生成（速度を変える）
+            enemies.Add(new Enemy(5, 5, 3));       // 3Tickごとに移動
+            enemies.Add(new Enemy(width - 3, height - 3, 4)); // 7Tickごとに移動
+
         }
 
         public bool IsWall(int x, int y)
@@ -62,17 +63,11 @@ namespace bomb
                 if (bombs[i].Tick())
                     bombs.RemoveAt(i);
             }
-
-            enemyTickCounter++;
-            if (enemyTickCounter >= 5) // 5Tickごとに移動
+            // 敵の更新（速度ごとに動く）
+            foreach (var enemy in enemies)
             {
-                enemyTickCounter = 0;
-                foreach (var enemy in enemies)
-                {
-                    enemy.Move(this);
-                }
+                enemy.Update(this);
             }
-
         }
 
 

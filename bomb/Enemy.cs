@@ -11,17 +11,30 @@ namespace bomb
     {
         public int X { get; private set; }
         public int Y { get; private set; }
+
         private Random rand = new Random();
-        
-        // ★ 引数付きコンストラクタを追加
-        public Enemy(int startX, int startY)
+        private int moveDelay;   // 移動間隔（Tick数）
+        private int tickCounter; // Tickカウンタ
+
+        public Enemy(int startX, int startY, int speed)
         {
             X = startX;
             Y = startY;
+            moveDelay = speed;   // 例: 3なら3Tickごとに移動
+            tickCounter = 0;
         }
 
-        // ランダム移動（壁判定あり）
-        public void Move(GameBoard board)
+        public void Update(GameBoard board)
+        {
+            tickCounter++;
+            if (tickCounter >= moveDelay)
+            {
+                tickCounter = 0;
+                Move(board);
+            }
+        }
+
+        private void Move(GameBoard board)
         {
             int dx = 0, dy = 0;
             int dir = rand.Next(4); // 0=上,1=下,2=左,3=右
