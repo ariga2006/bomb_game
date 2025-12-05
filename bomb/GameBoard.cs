@@ -17,7 +17,7 @@ namespace bomb
 
         public GameBoard(int width, int height)
         {
-            Player = new Player(1, 1);
+            Player = new Player();
             bombs = new List<Bomb>();
             map = new int[height, width];
 

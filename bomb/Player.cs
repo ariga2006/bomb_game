@@ -12,11 +12,12 @@ namespace bomb
         public int X { get; private set; }
         public int Y { get; private set; }
 
-        public Player(int x, int y)
+        public Player(int startX = 1, int startY = 1) // ← デフォルトを (1,1) に
         {
-            X = x;
-            Y = y;
+            X = startX;
+            Y = startY;
         }
+
 
         public void Move(int dx, int dy, GameBoard board)
         {
