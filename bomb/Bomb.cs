@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 
@@ -7,6 +8,10 @@ namespace bomb
 =======
 public class Bomb
 >>>>>>> 5d676e8 (爆風)
+=======
+
+public class Bomb
+>>>>>>> 6b3911c1995c66d36f5fcc62d802ef05a443a901
 {
     public int X { get; private set; }
     public int Y { get; private set; }
@@ -31,6 +36,7 @@ public class Bomb
             {
                 HasExploded = true;
             }
+<<<<<<< HEAD
         }
         else
         {
@@ -57,12 +63,27 @@ public class Bomb
             }
 
             return blast;
+=======
+>>>>>>> 6b3911c1995c66d36f5fcc62d802ef05a443a901
         }
+        else
+        {
+            explosionTimer--;
+        }
+    }
 
-        public void Draw(Graphics g, int cellSize)
+    public bool IsFinished()
+    {
+        return HasExploded && explosionTimer <= 0;
+    }
+
+    public void Draw(Graphics g, int cellSize)
+    {
+        if (!HasExploded)
         {
             g.FillEllipse(Brushes.Red, X * cellSize, Y * cellSize, cellSize, cellSize);
         }
+<<<<<<< HEAD
 
         // 爆風を描画（黄色）
         public void DrawBlast(Graphics g, int cellSize, List<Point> blast)
@@ -83,6 +104,8 @@ public class Bomb
         {
             g.FillEllipse(Brushes.Red, X * cellSize, Y * cellSize, cellSize, cellSize);
         }
+=======
+>>>>>>> 6b3911c1995c66d36f5fcc62d802ef05a443a901
         else
         {
             DrawExplosion(g, cellSize);
@@ -103,7 +126,10 @@ public class Bomb
             g.FillRectangle(explosionBrush, X * cellSize, (Y + i) * cellSize, cellSize, cellSize);
             g.FillRectangle(explosionBrush, (X - i) * cellSize, Y * cellSize, cellSize, cellSize);
             g.FillRectangle(explosionBrush, (X + i) * cellSize, Y * cellSize, cellSize, cellSize);
+<<<<<<< HEAD
 >>>>>>> 5d676e8 (爆風)
+=======
+>>>>>>> 6b3911c1995c66d36f5fcc62d802ef05a443a901
         }
     }
 }

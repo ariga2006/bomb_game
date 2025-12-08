@@ -21,10 +21,12 @@ namespace bomb
 
         public Form1()
         {
+
             InitializeComponent();
             this.Load += Form1_Load; // ← これが必要！
             this.KeyPreview = true;
             this.KeyDown += Form1_KeyDown;
+
 
             gameTimer = new Timer();
             gameTimer.Interval = 100;
@@ -40,6 +42,7 @@ namespace bomb
         private Timer gameTimer;
         private GameBoard board;
 
+<<<<<<< HEAD
         public Form1()
         {
 <<<<<<< HEAD
@@ -58,6 +61,9 @@ namespace bomb
             gameTimer.Start();
 
 <<<<<<< HEAD
+=======
+
+>>>>>>> 6b3911c1995c66d36f5fcc62d802ef05a443a901
             board = new GameBoard(20,20); // 15×15の盤面
         }
         
@@ -81,11 +87,13 @@ namespace bomb
 
 <<<<<<< HEAD
             Invalidate();
+
         }
 
         private void GameTimer_Tick(object sender, EventArgs e)
         {
             board.Update();
+
             Invalidate();
 =======
             Invalidate(); // 再描画
@@ -141,6 +149,7 @@ namespace bomb
     }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 =======
@@ -150,3 +159,7 @@ namespace bomb
 >>>>>>> 4b5cbbc (衝突消し)
 }
 >>>>>>> 0549bb0 (no message)
+=======
+}
+
+>>>>>>> 6b3911c1995c66d36f5fcc62d802ef05a443a901
