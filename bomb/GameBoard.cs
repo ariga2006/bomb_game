@@ -71,8 +71,10 @@ namespace bomb
             // 爆弾更新
             for (int i = bombs.Count - 1; i >= 0; i--)
             {
-                if (bombs[i].Tick())
+                bombs[i].Tick();
+                if (bombs[i].IsFinished())
                 {
+<<<<<<< HEAD
                     // 爆発処理
                     var blast = bombs[i].Explode();
                     foreach (var p in blast)
@@ -91,6 +93,9 @@ namespace bomb
                     }
 
                     bombs.RemoveAt(i);
+=======
+                    bombs.RemoveAt(i); // 爆風表示が終わったら削除
+>>>>>>> 5d676e8 (爆風)
                 }
             }
 
@@ -122,7 +127,7 @@ namespace bomb
             // プレイヤー描画
             Player.Draw(g, cellSize);
 
-            // 爆弾描画
+            // 爆弾 or 爆風描画
             foreach (var bomb in bombs)
             {
                 bomb.Draw(g, cellSize);
@@ -134,5 +139,6 @@ namespace bomb
                 enemy.Draw(g, cellSize);
             }
         }
+
     }
-}
+    }
