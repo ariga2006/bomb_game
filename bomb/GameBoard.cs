@@ -19,7 +19,11 @@ namespace bomb
         private List<Point> blasts = new List<Point>();
         private int blastTimer = 0; // 爆風の寿命管理
         private bool isGameClear = false;
-       
+        public void PlaceBomb()
+        {
+            bombs.Add(new Bomb(Player.X, Player.Y, map));
+        }
+
         public int Width => map.GetLength(1);
 public int Height => map.GetLength(0);
 public int[,] Map => map; // 爆風判定用に公開
@@ -68,10 +72,7 @@ public int[,] Map => map; // 爆風判定用に公開
             return map[y, x] == 1 || map[y, x] == 2;
         }
 
-        public void PlaceBomb()
-        {
-            bombs.Add(new Bomb(Player.X, Player.Y));
-        }
+        
 
         public void Update()
         {
