@@ -20,7 +20,7 @@ namespace bomb
             X = x;
             Y = y;
         }
-
+        
         public bool Tick()
         {
             timer--;
@@ -36,17 +36,49 @@ namespace bomb
             blast.Add(new Point(X, Y));
 
             // 上下左右に広げる
-            for (int i = 1; i <= range; i++)
+            int[][] dirs = new int[][]
             {
-                blast.Add(new Point(X + i, Y)); // 右
-                blast.Add(new Point(X - i, Y)); // 左
-                blast.Add(new Point(X, Y + i)); // 下
-                blast.Add(new Point(X, Y - i)); // 上
+        new int[] { 1, 0 },   // 右
+        new int[] { -1, 0 },  // 左
+        new int[] { 0, 1 },   // 下
+        new int[] { 0, -1 }   // 上
+            };
+
+            foreach (var dir in dirs)
+            {
+                int dx = dir[0];
+                int dy = dir[1];
+
+                for (int i = 1; i <= range; i++)
+                {
+                    int nx = X + dx * i;
+                    int ny = Y + dy * i;
+
+                    // 範囲外チェック（map があるならここで判定）
+                    if (nx < 0 || ny < 0 || nx >= map.GetLength(1) || ny >= map.GetLength(0))
+                        break;
+
+                    // ★ 壊せない壁なら爆風を止める
+                    if (map[ny, nx] == 1)
+                        break;
+
+                    // 爆風に追加
+                    blast.Add(new Point(nx, ny));
+
+                    // 壊せる障害物なら消すが、その先も広がる
+                    if (map[ny, nx] == 2)
+                    {
+                        map[ny, nx] = 0; // 消す
+                                         // break しない → 爆風はさらに広がる
+                    }
+                }
+
             }
 
             return blast;
         }
 
+        
         public void Draw(Graphics g, int cellSize)
         {
             g.FillEllipse(Brushes.Red, X * cellSize, Y * cellSize, cellSize, cellSize);
@@ -60,5 +92,7 @@ namespace bomb
                 g.FillRectangle(Brushes.Yellow, p.X * cellSize, p.Y * cellSize, cellSize, cellSize);
             }
         }
+
+    
     }
 }
