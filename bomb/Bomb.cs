@@ -14,13 +14,15 @@ namespace bomb
         public int X { get; private set; }
         public int Y { get; private set; }
         private int timer = 20; // Tick回数で寿命管理
+        private int[,] map;     // ★ マップを保持
 
-        public Bomb(int x, int y)
+        public Bomb(int x, int y, int[,] map)
         {
             X = x;
             Y = y;
+            this.map = map; // ★ ここで初期化
         }
-        
+
         public bool Tick()
         {
             timer--;
@@ -54,9 +56,10 @@ namespace bomb
                     int nx = X + dx * i;
                     int ny = Y + dy * i;
 
-                    // 範囲外チェック（map があるならここで判定）
-                    if (nx < 0 || ny < 0 || nx >= map.GetLength(1) || ny >= map.GetLength(0))
-                        break;
+                   // 範囲外チェック
+                if (nx < 0 || ny < 0 || nx >= map.GetLength(1) || ny >= map.GetLength(0))
+                    break;
+
 
                     // ★ 壊せない壁なら爆風を止める
                     if (map[ny, nx] == 1)
