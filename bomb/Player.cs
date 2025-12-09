@@ -22,13 +22,14 @@ namespace bomb
             int newX = X + dx;
             int newY = Y + dy;
 
-            // 壁判定
-            if (!board.IsWall(newX, newY))
+            // 壁 or 爆弾がある場所には移動できない
+            if (!board.IsWall(newX, newY) && !board.IsBomb(newX, newY))
             {
                 X = newX;
                 Y = newY;
             }
         }
+
 
         // やられ判定
         public void Kill()
@@ -44,8 +45,13 @@ namespace bomb
             }
             else
             {
-                g.FillRectangle(Brushes.DarkRed, X * cellSize, Y * cellSize, cellSize, cellSize);
+                Pen pen = new Pen(Color.Red, 3);
+                g.DrawLine(pen, X * cellSize, Y * cellSize,
+                           (X + 1) * cellSize, (Y + 1) * cellSize);
+                g.DrawLine(pen, (X + 1) * cellSize, Y * cellSize,
+                           X * cellSize, (Y + 1) * cellSize);
             }
         }
+  
     }
 }
