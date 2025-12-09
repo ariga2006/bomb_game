@@ -35,6 +35,13 @@ public int[,] Map => map; // 爆風判定用に公開
             enemies = new List<Enemy>();
             map = new int[height, width];
 
+            // 敵の初期位置リスト
+            List<Point> enemyStarts = new List<Point>
+    {
+        new Point(5, 5),
+        new Point(width - 3, height - 3)
+    };
+
             // 外周は壊せない壁
             for (int y = 0; y < height; y++)
             {
@@ -46,18 +53,34 @@ public int[,] Map => map; // 爆風判定用に公開
                     }
                     else
                     {
-                        // ランダムで障害物を追加
-                        if (!(x == Player.X && y == Player.Y))
+                        // ★ プレイヤー周囲は必ず空白
+                        if (Math.Abs(x - Player.X) <= 1 && Math.Abs(y - Player.Y) <= 1)
                         {
-                            int r = rand.Next(100);
-                            if (r < 15) map[y, x] = 1; // 15% 壊せない壁
-                            else if (r < 35) map[y, x] = 2; // 20% 壊せる障害物
-                            else map[y, x] = 0; // 空白
+                            map[y, x] = 0;
+                            continue;
                         }
-                        else
+
+                        // ★ 敵周囲も必ず空白
+                        bool nearEnemy = false;
+                        foreach (var e in enemyStarts)
                         {
-                            map[y, x] = 0; // プレイヤー位置は空白
+                            if (Math.Abs(x - e.X) <= 1 && Math.Abs(y - e.Y) <= 1)
+                            {
+                                nearEnemy = true;
+                                break;
+                            }
                         }
+                        if (nearEnemy)
+                        {
+                            map[y, x] = 0;
+                            continue;
+                        }
+
+                        // ランダム配置
+                        int r = rand.Next(100);
+                        if (r < 15) map[y, x] = 1; // 壊せない壁
+                        else if (r < 35) map[y, x] = 2; // 壊せる障害物
+                        else map[y, x] = 0; // 空白
                     }
                 }
             }

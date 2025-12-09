@@ -32,6 +32,7 @@ namespace bomb
                 tickCounter = 0;
                 Move(board);
             }
+           
         }
 
         private void Move(GameBoard board)
