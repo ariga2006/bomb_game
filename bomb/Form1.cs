@@ -48,11 +48,7 @@ namespace bomb
 
 
 
-            // ★ 盤面を 21×21 にする
-            board = new GameBoard(21, 21);
-
-            // ★ ウィンドウサイズを盤面に合わせる
-            this.ClientSize = new Size(board.Width * 30, board.Height * 30);
+            
         }
 
         
