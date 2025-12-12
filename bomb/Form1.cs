@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -27,9 +28,9 @@ namespace bomb
             gameTimer.Tick += GameTimer_Tick;
             gameTimer.Start();
 
-            board = new GameBoard(20,20); // 15×15の盤面
+            board = new GameBoard(20, 20); // 15×15の盤面
         }
-        
+
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {

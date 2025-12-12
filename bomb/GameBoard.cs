@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 
 
+
 namespace bomb
 {
     public class GameBoard
@@ -19,6 +20,11 @@ namespace bomb
         private List<Point> blasts = new List<Point>();
         private int blastTimer = 0; // 爆風の寿命管理
         private bool isGameClear = false;
+        private bool isGameStarted = false;
+        // 起動時メッセージ表示用
+        private bool showStartMessage = true;     // 表示するかどうか
+        private int startMessageTimer = 10;      // 表示時間（Update呼び出し回数で管理）
+
         public void PlaceBomb()
         {
             bombs.Add(new Bomb(Player.X, Player.Y, map));
@@ -95,10 +101,26 @@ public int[,] Map => map; // 爆風判定用に公開
             return map[y, x] == 1 || map[y, x] == 2;
         }
 
-        
+        public void StartGame()
+        {
+            isGameStarted = true;
+        }
+
+
 
         public void Update()
-        {
+        {// 起動時メッセージが表示中ならタイマーを減らす
+            if (showStartMessage)
+            {
+                startMessageTimer--;
+                if (startMessageTimer <= 0)
+                {
+                    showStartMessage = false; // 一定時間経過で非表示にする
+                }
+                return; // メッセージ表示中はゲーム更新しない
+            }
+
+
             // 爆弾更新
             for (int i = bombs.Count - 1; i >= 0; i--)
             {
@@ -160,6 +182,7 @@ public int[,] Map => map; // 爆風判定用に公開
 
         public void Draw(Graphics g)
         {
+
             // 壁描画
             for (int y = 0; y < map.GetLength(0); y++)
             {
@@ -186,6 +209,7 @@ public int[,] Map => map; // 爆風判定用に公開
             // 敵描画
             foreach (var enemy in enemies)
                 enemy.Draw(g, cellSize);
+
             // ★ 死亡後にゲームオーバー表示
             if (!Player.IsAlive)
             {
@@ -199,6 +223,20 @@ public int[,] Map => map; // 爆風判定用に公開
 
                 g.DrawString(text, font, Brushes.Red, centerX, centerY);
             }
+            if (showStartMessage)
+            {
+                string text = "敵を全滅させてください";
+                Font font = new Font("Arial", 32, FontStyle.Bold);
+                SizeF textSize = g.MeasureString(text, font);
+
+                float centerX = (map.GetLength(1) * cellSize - textSize.Width) / 2;
+                float centerY = (map.GetLength(0) * cellSize - textSize.Height) / 2;
+
+                g.DrawString(text, font, Brushes.Blue, centerX, centerY);
+                return;
+
+            }
+            // ←ここから下は既存の描画処理（壁、プレイヤー、爆弾など）
             // ★ ゲームクリア表示
             if (isGameClear)
             {
