@@ -20,6 +20,8 @@ namespace bomb
         private List<Point> blasts = new List<Point>();
         private int blastTimer = 0; // 爆風の寿命管理
         private bool isGameClear = false;
+        internal bool IsGameClear;
+
         public void PlaceBomb()
         {
             bombs.Add(new Bomb(Player.X, Player.Y, map));
@@ -230,6 +232,16 @@ namespace bomb
                 float centerY = (map.GetLength(0) * cellSize - textSize.Height) / 2;
 
                 g.DrawString(text, font, Brushes.Red, centerX, centerY);
+
+                // ★ 再挑戦コメントを追加
+                string retryText = "スペースキーで再挑戦！";
+                Font retryFont = new Font("Arial", 20, FontStyle.Bold);
+                SizeF retrySize = g.MeasureString(retryText, retryFont);
+
+                float retryX = (map.GetLength(1) * cellSize - retrySize.Width) / 2;
+                float retryY = centerY + textSize.Height + 20; // GAME OVER の下に表示
+
+                g.DrawString(retryText, retryFont, Brushes.Blue, retryX, retryY);
             }
 
             // GAME CLEAR 表示
@@ -243,6 +255,16 @@ namespace bomb
                 float centerY = (map.GetLength(0) * cellSize - textSize.Height) / 2;
 
                 g.DrawString(text, font, Brushes.Green, centerX, centerY);
+
+                // ★ 再挑戦コメントを追加
+                string retryText = "スペースキーで再挑戦！";
+                Font retryFont = new Font("Arial", 20, FontStyle.Bold);
+                SizeF retrySize = g.MeasureString(retryText, retryFont);
+
+                float retryX = (map.GetLength(1) * cellSize - retrySize.Width) / 2;
+                float retryY = centerY + textSize.Height + 20;
+
+                g.DrawString(retryText, retryFont, Brushes.Blue, retryX, retryY);
             }
         }
     }
