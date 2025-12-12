@@ -55,16 +55,25 @@ namespace bomb
             this.ClientSize = new Size(board.Width * 30, board.Height * 30);
         }
 
+
+
         private void StartButton_Click(object sender, EventArgs e)
         {
             // ボタンを消す
             startButton.Visible = false;
+            // すでにゲーム中なら再生成しない
+            if (board == null || !board.Player.IsAlive)
+            {
+                board = new GameBoard(21, 21);
+                gameTimer.Start();
+                Invalidate();
+            }
 
-            // ★ ゲーム開始処理
-            board = new GameBoard(21, 21);
-            gameTimer.Start();
-            Invalidate();
+
+            // ★ ウィンドウサイズを盤面に合わせる
+            this.ClientSize = new Size(board.Width * 30, board.Height * 30);
         }
+
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -81,8 +90,9 @@ namespace bomb
             if (e.KeyCode == Keys.D) board.Player.Move(1, 0, board);
 
             if (e.KeyCode == Keys.Space) board.PlaceBomb();
+            Invalidate(); // ★ 爆弾設置後に再描画
 
-            Invalidate();
+
         }
 
         private void GameTimer_Tick(object sender, EventArgs e)
@@ -102,5 +112,6 @@ namespace bomb
                 board.Draw(e.Graphics);
             }
         }
+
     }
 }
