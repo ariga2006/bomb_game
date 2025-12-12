@@ -20,14 +20,19 @@ namespace bomb
         private List<Point> blasts = new List<Point>();
         private int blastTimer = 0; // 爆風の寿命管理
         private bool isGameClear = false;
-        // 起動時メッセージ表示用
-        private bool showStartMessage = true;     // 表示するかどうか
-        private int startMessageTimer = 10;      // 表示時間（Update呼び出し回数で管理）
         public void PlaceBomb()
         {
             bombs.Add(new Bomb(Player.X, Player.Y, map));
         }
-
+        public bool IsBomb(int x, int y)
+        {
+            foreach (var bomb in bombs)
+            {
+                if (bomb.X == x && bomb.Y == y)
+                    return true;
+            }
+            return false;
+        }
         public int Width => map.GetLength(1);
         public int Height => map.GetLength(0);
         public int[,] Map => map; // 爆風判定用に公開
@@ -99,19 +104,11 @@ namespace bomb
             return map[y, x] == 1 || map[y, x] == 2;
         }
 
-        
+
 
         public void Update()
         {// 起動時メッセージが表示中ならタイマーを減らす
-            if (showStartMessage)
-            {
-                startMessageTimer--;
-                if (startMessageTimer <= 0)
-                {
-                    showStartMessage = false; // 一定時間経過で非表示にする
-                }
-                return; // メッセージ表示中はゲーム更新しない
-            }
+
 
 
             // 爆弾更新
@@ -168,6 +165,18 @@ namespace bomb
 
         public void Draw(Graphics g)
         {
+            // 背景を優しい芝生模様にする
+            for (int y = 0; y < map.GetLength(0); y++)
+            {
+                for (int x = 0; x < map.GetLength(1); x++)
+                {
+                    if ((x + y) % 2 == 0)
+                        g.FillRectangle(Brushes.Honeydew, x * cellSize, y * cellSize, cellSize, cellSize);
+                    else
+                        g.FillRectangle(Brushes.PaleGreen, x * cellSize, y * cellSize, cellSize, cellSize);
+                }
+            }
+
             // 壁描画
             for (int y = 0; y < map.GetLength(0); y++)
             {
@@ -206,10 +215,11 @@ namespace bomb
             foreach (var p in blasts)
                 g.FillRectangle(Brushes.Yellow, p.X * cellSize, p.Y * cellSize, cellSize, cellSize);
 
-            // 敵描画
+            // 敵描画（Enemy.Draw 内で赤色にすると良い）
             foreach (var enemy in enemies)
                 enemy.Draw(g, cellSize);
-            // ★ 死亡後にゲームオーバー表示
+
+            // GAME OVER 表示
             if (!Player.IsAlive)
             {
                 string text = "GAME OVER";
@@ -221,7 +231,8 @@ namespace bomb
 
                 g.DrawString(text, font, Brushes.Red, centerX, centerY);
             }
-            // ★ ゲームクリア表示
+
+            // GAME CLEAR 表示
             if (isGameClear)
             {
                 string text = "GAME CLEAR!";
@@ -233,17 +244,6 @@ namespace bomb
 
                 g.DrawString(text, font, Brushes.Green, centerX, centerY);
             }
-        }
-
-
-        public bool IsBomb(int x, int y)
-        {
-            foreach (var bomb in bombs)
-            {
-                if (bomb.X == x && bomb.Y == y)
-                    return true;
-            }
-            return false;
         }
     }
 }
