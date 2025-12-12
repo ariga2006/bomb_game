@@ -79,7 +79,7 @@ namespace bomb
             // ★ ウィンドウサイズを盤面に合わせる
             this.ClientSize = new Size(board.Width * 30, board.Height * 30);
         }
-
+        
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {

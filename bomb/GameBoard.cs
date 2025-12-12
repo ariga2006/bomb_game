@@ -20,19 +20,14 @@ namespace bomb
         private List<Point> blasts = new List<Point>();
         private int blastTimer = 0; // 爆風の寿命管理
         private bool isGameClear = false;
-        private bool isGameStarted = false;
-        // 起動時メッセージ表示用
-        private bool showStartMessage = true;     // 表示するかどうか
-        private int startMessageTimer = 10;      // 表示時間（Update呼び出し回数で管理）
-
         public void PlaceBomb()
         {
             bombs.Add(new Bomb(Player.X, Player.Y, map));
         }
 
         public int Width => map.GetLength(1);
-public int Height => map.GetLength(0);
-public int[,] Map => map; // 爆風判定用に公開
+        public int Height => map.GetLength(0);
+        public int[,] Map => map; // 爆風判定用に公開
 
         public GameBoard(int width, int height)
         {
@@ -43,10 +38,10 @@ public int[,] Map => map; // 爆風判定用に公開
 
             // 敵の初期位置リスト
             List<Point> enemyStarts = new List<Point>
-    {
-        new Point(5, 5),
-        new Point(width - 3, height - 3)
-    };
+            {
+                new Point(5, 5),
+                new Point(width - 3, height - 3)
+            };
 
             // 外周は壊せない壁
             for (int y = 0; y < height; y++)
@@ -59,14 +54,14 @@ public int[,] Map => map; // 爆風判定用に公開
                     }
                     else
                     {
-                        // ★ プレイヤー周囲は必ず空白
+                        // プレイヤー周囲は必ず空白
                         if (Math.Abs(x - Player.X) <= 1 && Math.Abs(y - Player.Y) <= 1)
                         {
                             map[y, x] = 0;
                             continue;
                         }
 
-                        // ★ 敵周囲も必ず空白
+                        // 敵周囲も必ず空白
                         bool nearEnemy = false;
                         foreach (var e in enemyStarts)
                         {
@@ -101,12 +96,7 @@ public int[,] Map => map; // 爆風判定用に公開
             return map[y, x] == 1 || map[y, x] == 2;
         }
 
-        public void StartGame()
-        {
-            isGameStarted = true;
-        }
-
-
+        
 
         public void Update()
         {// 起動時メッセージが表示中ならタイマーを減らす
@@ -126,8 +116,6 @@ public int[,] Map => map; // 爆風判定用に公開
             {
                 if (bombs[i].Tick())
                 {
-                    // 爆発処理
-                    // 爆風を計算
                     var blast = bombs[i].Explode();
 
                     blasts.AddRange(blast);
@@ -143,16 +131,14 @@ public int[,] Map => map; // 爆風判定用に公開
 
                         if (Player.X == p.X && Player.Y == p.Y)
                             Player.Kill();
-                        // ★ 敵が爆風にいたら死亡（リストから削除）
-                        enemies.RemoveAll(e => e.X == p.X && e.Y == p.Y);
 
+                        enemies.RemoveAll(e => e.X == p.X && e.Y == p.Y);
                     }
 
                     bombs.RemoveAt(i);
                 }
             }
 
-            // 爆風寿命を減らす
             if (blastTimer > 0)
             {
                 blastTimer--;
@@ -160,38 +146,49 @@ public int[,] Map => map; // 爆風判定用に公開
                     blasts.Clear();
             }
 
-            // 敵更新＋接触判定
             foreach (var enemy in enemies)
             {
                 enemy.Update(this);
 
-                // ★ プレイヤーと同じ座標なら死亡
                 if (enemy.X == Player.X && enemy.Y == Player.Y)
                 {
                     Player.Kill();
                 }
-
             }
-            // ★ 敵が全滅したらゲームクリア
+
             if (enemies.Count == 0 && Player.IsAlive)
             {
                 isGameClear = true;
             }
-
         }
+
 
         public void Draw(Graphics g)
         {
-
             // 壁描画
             for (int y = 0; y < map.GetLength(0); y++)
             {
                 for (int x = 0; x < map.GetLength(1); x++)
                 {
                     if (map[y, x] == 1)
-                        g.FillRectangle(Brushes.Gray, x * cellSize, y * cellSize, cellSize, cellSize);
+                    {
+                        // 壊せない壁 → 灰色レンガ模様
+                        Rectangle rect = new Rectangle(x * cellSize, y * cellSize, cellSize, cellSize);
+                        g.FillRectangle(Brushes.Gray, rect);
+
+                        g.DrawLine(Pens.Black, rect.Left, rect.Top + cellSize / 2, rect.Right, rect.Top + cellSize / 2);
+                        g.DrawLine(Pens.Black, rect.Left + cellSize / 2, rect.Top, rect.Left + cellSize / 2, rect.Top + cellSize / 2);
+                    }
                     else if (map[y, x] == 2)
-                        g.FillRectangle(Brushes.Brown, x * cellSize, y * cellSize, cellSize, cellSize);
+                    {
+                        // 壊せる壁 → 茶色の木箱風
+                        Rectangle rect = new Rectangle(x * cellSize, y * cellSize, cellSize, cellSize);
+                        g.FillRectangle(Brushes.SaddleBrown, rect);
+
+                        g.DrawRectangle(Pens.Black, rect);
+                        g.DrawLine(Pens.Black, rect.Left, rect.Top, rect.Right, rect.Bottom);
+                        g.DrawLine(Pens.Black, rect.Right, rect.Top, rect.Left, rect.Bottom);
+                    }
                 }
             }
 
@@ -209,7 +206,6 @@ public int[,] Map => map; // 爆風判定用に公開
             // 敵描画
             foreach (var enemy in enemies)
                 enemy.Draw(g, cellSize);
-
             // ★ 死亡後にゲームオーバー表示
             if (!Player.IsAlive)
             {
@@ -217,26 +213,11 @@ public int[,] Map => map; // 爆風判定用に公開
                 Font font = new Font("Arial", 32, FontStyle.Bold);
                 SizeF textSize = g.MeasureString(text, font);
 
-                // 画面中央に描画
                 float centerX = (map.GetLength(1) * cellSize - textSize.Width) / 2;
                 float centerY = (map.GetLength(0) * cellSize - textSize.Height) / 2;
 
                 g.DrawString(text, font, Brushes.Red, centerX, centerY);
             }
-            if (showStartMessage)
-            {
-                string text = "敵を全滅させてください";
-                Font font = new Font("Arial", 32, FontStyle.Bold);
-                SizeF textSize = g.MeasureString(text, font);
-
-                float centerX = (map.GetLength(1) * cellSize - textSize.Width) / 2;
-                float centerY = (map.GetLength(0) * cellSize - textSize.Height) / 2;
-
-                g.DrawString(text, font, Brushes.Blue, centerX, centerY);
-                return;
-
-            }
-            // ←ここから下は既存の描画処理（壁、プレイヤー、爆弾など）
             // ★ ゲームクリア表示
             if (isGameClear)
             {
@@ -249,9 +230,9 @@ public int[,] Map => map; // 爆風判定用に公開
 
                 g.DrawString(text, font, Brushes.Green, centerX, centerY);
             }
-
-
         }
+
+
         public bool IsBomb(int x, int y)
         {
             foreach (var bomb in bombs)
