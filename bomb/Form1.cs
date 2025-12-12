@@ -31,8 +31,7 @@ namespace bomb
             // ★ 最初は止めておく
             gameTimer.Stop();
 
-            // ★ ウィンドウサイズは固定（盤面に合わせるならここで設定）
-            this.ClientSize = new Size(21 * 30, 21 * 30);
+            
 
             // ★ スタートボタン作成
             startButton = new Button();
