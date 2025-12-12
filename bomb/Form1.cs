@@ -47,27 +47,28 @@ namespace bomb
             this.Controls.Add(startButton);
 
 
-<<<<<<< HEAD
-            // ★ 盤面を 21×21 にする
-            board = new GameBoard(21, 21);
 
-            // ★ ウィンドウサイズを盤面に合わせる
-            this.ClientSize = new Size(board.Width * 30, board.Height * 30);
+           
         }
-=======
-        }
+
+        
 
         private void StartButton_Click(object sender, EventArgs e)
         {
             // ボタンを消す
             startButton.Visible = false;
+            if (board == null || !board.Player.IsAlive)
+            {
 
-            // ★ ゲーム開始処理
-            board = new GameBoard(21, 21);
-            gameTimer.Start();
-            Invalidate();
+                // ★ ゲーム開始処理
+                board = new GameBoard(21, 21);
+                gameTimer.Start();
+                Invalidate();
+            }
+            // ★ ウィンドウサイズを盤面に合わせる
+            this.ClientSize = new Size(board.Width * 30, board.Height * 30);
         }
->>>>>>> mono
+
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
