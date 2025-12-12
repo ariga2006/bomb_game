@@ -46,13 +46,9 @@ namespace bomb
             startButton.Click += StartButton_Click;
             this.Controls.Add(startButton);
 
-
-
-            
         }
 
         
-
 
 
         private void StartButton_Click(object sender, EventArgs e)
@@ -71,6 +67,8 @@ namespace bomb
             // ★ ウィンドウサイズを盤面に合わせる
             this.ClientSize = new Size(board.Width * 30, board.Height * 30);
         }
+
+       
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             if (board == null) return; // ★ ゲーム開始前は無効
