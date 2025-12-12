@@ -20,6 +20,9 @@ namespace bomb
         private List<Point> blasts = new List<Point>();
         private int blastTimer = 0; // 爆風の寿命管理
         private bool isGameClear = false;
+        // 起動時メッセージ表示用
+        private bool showStartMessage = true;     // 表示するかどうか
+        private int startMessageTimer = 10;      // 表示時間（Update呼び出し回数で管理）
         public void PlaceBomb()
         {
             bombs.Add(new Bomb(Player.X, Player.Y, map));

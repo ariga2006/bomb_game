@@ -31,7 +31,6 @@ namespace bomb
             // ★ 最初は止めておく
             gameTimer.Stop();
 
-<<<<<<< HEAD
             // ★ ウィンドウサイズは固定（盤面に合わせるならここで設定）
             this.ClientSize = new Size(21 * 30, 21 * 30);
 
@@ -57,11 +56,7 @@ namespace bomb
         }
 
         
-=======
-            board = new GameBoard(20, 20); // 15×15の盤面
-        }
 
->>>>>>> b9b5e99 (ゲーム開始時にクリア条件を表示)
 
         private void StartButton_Click(object sender, EventArgs e)
         {
