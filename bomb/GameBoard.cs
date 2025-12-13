@@ -209,6 +209,23 @@ namespace bomb
             // 敵描画
             foreach (var enemy in enemies)
                 enemy.Draw(g, cellSize);
+
+
+            if (showStartMessage)
+            {
+                string text = "敵を全滅させてください";
+                Font font = new Font("Arial", 32, FontStyle.Bold);
+                SizeF textSize = g.MeasureString(text, font);
+
+                float centerX = (map.GetLength(1) * cellSize - textSize.Width) / 2;
+                float centerY = (map.GetLength(0) * cellSize - textSize.Height) / 2;
+
+                g.DrawString(text, font, Brushes.Blue, centerX, centerY);
+                return;
+            }
+
+
+
             // ★ 死亡後にゲームオーバー表示
             if (!Player.IsAlive)
             {
