@@ -55,8 +55,10 @@ namespace bomb
 
         private void StartButton_Click(object sender, EventArgs e)
         {
-            // ボタンを消す
             startButton.Visible = false;
+
+           
+
             // すでにゲーム中なら再生成しない
             if (board == null || !board.Player.IsAlive)
             {
@@ -65,6 +67,8 @@ namespace bomb
                 Invalidate();
             }
 
+            //起動時メッセージを表示
+            board.ShowStartMessage();
 
             // ★ ウィンドウサイズを盤面に合わせる
             this.ClientSize = new Size(board.Width * 30, board.Height * 30);

@@ -21,6 +21,8 @@ namespace bomb
         private int blastTimer = 0; // 爆風の寿命管理
         private bool isGameClear = false;
         internal bool IsGameClear;
+        private bool showStartMessage = false;   // 表示中かどうか
+        private int startMessageTimer = 0;       // 残り時間（フレーム数）
 
         public void PlaceBomb()
         {
@@ -39,6 +41,12 @@ namespace bomb
         public int Height => map.GetLength(0);
         public int[,] Map => map; // 爆風判定用に公開
 
+        public void ShowStartMessage()
+        {
+            showStartMessage = true;
+            // 1秒分のフレーム数（例: Timer.Interval=100msなら20回分）
+            startMessageTimer = 10;
+        }
         public GameBoard(int width, int height)
         {
             Player = new Player(1, 1);
@@ -106,11 +114,20 @@ namespace bomb
             return map[y, x] == 1 || map[y, x] == 2;
         }
 
+        
+
 
 
         public void Update()
-        {// 起動時メッセージが表示中ならタイマーを減らす
-
+        {
+            if (showStartMessage)
+            {
+                startMessageTimer--;
+                if (startMessageTimer <= 0)
+                {
+                    showStartMessage = false; // 1秒経過で消す
+                }
+            }
 
 
             // 爆弾更新
@@ -167,6 +184,7 @@ namespace bomb
 
         public void Draw(Graphics g)
         {
+
             // 背景を優しい芝生模様にする
             for (int y = 0; y < map.GetLength(0); y++)
             {
@@ -221,7 +239,23 @@ namespace bomb
             foreach (var enemy in enemies)
                 enemy.Draw(g, cellSize);
 
-            // GAME OVER 表示
+            // ★スタートメッセージ表示
+            if (showStartMessage)
+            {
+                string text = "敵を全滅させてください";
+                Font font = new Font("Arial", 32, FontStyle.Bold);
+                SizeF textSize = g.MeasureString(text, font);
+
+                float centerX = (map.GetLength(1) * cellSize - textSize.Width) / 2;
+                float centerY = (map.GetLength(0) * cellSize - textSize.Height) / 2;
+
+                g.DrawString(text, font, Brushes.Blue, centerX, centerY);
+            }
+
+
+
+
+            // ★ 死亡後にゲームオーバー表示
             if (!Player.IsAlive)
             {
                 string text = "GAME OVER";
