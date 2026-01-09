@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
+
 namespace bomb
 {
     public partial class Form1 : Form
@@ -17,8 +18,11 @@ namespace bomb
         private Timer gameTimer;
         private GameBoard board;
         private Button startButton;
-        private Timer delayTimer; // ★ 遅延用タイマー
+        private Timer delayTimer;
         private bool isGameEnded = false;
+
+        // ★追加：「最初の1回だけメッセージを出したか？」
+        private bool hasShownStartMessage = false;
 
         public Form1()
         {
@@ -30,36 +34,24 @@ namespace bomb
             gameTimer = new Timer();
             gameTimer.Interval = 100;
             gameTimer.Tick += GameTimer_Tick;
-            // ★ 最初は止めておく
             gameTimer.Stop();
 
-            
-            // ★ スタートボタン作成
             startButton = new Button();
             startButton.Text = "START";
             startButton.Font = new Font("Arial", 24, FontStyle.Bold);
             startButton.Size = new Size(200, 80);
-            // ★ フォーム中央に配置
             startButton.Location = new Point(
                 (this.ClientSize.Width - startButton.Width) / 2,
                 (this.ClientSize.Height - startButton.Height) / 2
             );
             startButton.Click += StartButton_Click;
             this.Controls.Add(startButton);
-
-
         }
-
-        
-
 
         private void StartButton_Click(object sender, EventArgs e)
         {
             startButton.Visible = false;
 
-           
-
-            // すでにゲーム中なら再生成しない
             if (board == null || !board.Player.IsAlive)
             {
                 board = new GameBoard(21, 21);
@@ -67,13 +59,15 @@ namespace bomb
                 Invalidate();
             }
 
-            //起動時メッセージを表示
-            board.ShowStartMessage();
+            // ★ 最初の1回だけスタートメッセージを出す
+            if (!hasShownStartMessage)
+            {
+                board.ShowStartMessage();
+                hasShownStartMessage = true;
+            }
 
-            // ★ ウィンドウサイズを盤面に合わせる
             this.ClientSize = new Size(board.Width * 30, board.Height * 30);
         }
-
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -84,16 +78,17 @@ namespace bomb
                 gameTimer.Start();
                 isGameEnded = false;
                 startButton.Visible = false;
+
+                // ★ここでは絶対に ShowStartMessage() を呼ばない
                 Invalidate();
                 return;
             }
 
-            if (board == null) return;          // ゲーム開始前は無効
-            if (isGameEnded) return;            // ★ 終了中はキー入力禁止
-            if (!board.Player.IsAlive) return;  // 死亡後はキー入力禁止
-            if (board.IsGameClear) return;      // ゲームクリア後もキー入力禁止
+            if (board == null) return;
+            if (isGameEnded) return;
+            if (!board.Player.IsAlive) return;
+            if (board.IsGameClear) return;
 
-            // ここから先はゲーム中のみ有効
             if (e.KeyCode == Keys.Up) board.Player.Move(0, -1, board);
             if (e.KeyCode == Keys.Down) board.Player.Move(0, 1, board);
             if (e.KeyCode == Keys.Left) board.Player.Move(-1, 0, board);
@@ -109,17 +104,21 @@ namespace bomb
             Invalidate();
         }
 
-
         private void GameTimer_Tick(object sender, EventArgs e)
         {
             if (board != null)
             {
                 board.Update();
-                Invalidate();
 
+                // ゲーム終了したらフラグを立てる
+                if (!board.Player.IsAlive || board.IsGameClear)
+                {
+                    isGameEnded = true;
+                }
+
+                Invalidate();
             }
         }
-
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -129,7 +128,5 @@ namespace bomb
                 board.Draw(e.Graphics);
             }
         }
-        
-
     }
 }
