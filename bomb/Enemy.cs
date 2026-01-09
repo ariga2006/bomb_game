@@ -51,7 +51,8 @@ namespace bomb
             int newX = X + dx;
             int newY = Y + dy;
 
-            if (!board.IsWall(newX, newY))
+            // ★ 爆弾の上には進めないようにする
+            if (!board.IsWall(newX, newY) && !board.IsBomb(newX, newY))
             {
                 X = newX;
                 Y = newY;

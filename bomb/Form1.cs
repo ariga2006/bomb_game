@@ -71,7 +71,7 @@ namespace bomb
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            // ★ 終了中ならスペースキーで再挑戦
+            
             if (isGameEnded && e.KeyCode == Keys.Space)
             {
                 board = new GameBoard(21, 21);
@@ -79,7 +79,8 @@ namespace bomb
                 isGameEnded = false;
                 startButton.Visible = false;
 
-                // ★ここでは絶対に ShowStartMessage() を呼ばない
+                board.ShowStartMessage();   // ★追加：再スタート時も必ず表示
+
                 Invalidate();
                 return;
             }
