@@ -29,6 +29,14 @@ namespace bomb
 
         public void PlaceBomb()
         {
+            // ★ 爆弾が5個以上なら置けない
+            if (bombs.Count >= 5)
+                return;
+
+            // ★ すでにその場所に爆弾がある場合も置かない（安全）
+            if (IsBomb(Player.X, Player.Y))
+                return;
+
             bombs.Add(new Bomb(Player.X, Player.Y, map));
         }
 
