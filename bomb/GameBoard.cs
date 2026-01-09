@@ -7,6 +7,7 @@ using System.Drawing;
 
 
 
+
 namespace bomb
 {
     public class GameBoard
@@ -21,7 +22,9 @@ namespace bomb
         private int blastTimer = 0;
         private bool isGameClear = false;
 
-        // ★ 追加：Form1 から参照するためのプロパティ
+        // ★ 追加：敵死亡エフェクト
+        private List<(Point pos, int timer)> deathEffects = new List<(Point, int)>();
+
         public bool IsGameClear => isGameClear;
 
         private bool showStartMessage = false;
@@ -29,11 +32,9 @@ namespace bomb
 
         public void PlaceBomb()
         {
-            // ★ 爆弾が5個以上なら置けない
             if (bombs.Count >= 5)
                 return;
 
-            // ★ すでにその場所に爆弾がある場合も置かない（安全）
             if (IsBomb(Player.X, Player.Y))
                 return;
 
@@ -60,7 +61,7 @@ namespace bomb
 
         public GameBoard(int width, int height)
         {
-            showStartMessage = false;   // ★ 最初の1回以外は表示しない
+            showStartMessage = false;
             startMessageTimer = 0;
 
             Player = new Player(1, 1);
@@ -113,8 +114,9 @@ namespace bomb
                 }
             }
 
-            enemies.Add(new Enemy(5, 5, 3));
-            enemies.Add(new Enemy(width - 3, height - 3, 4));
+            enemies.Add(new Enemy(5, 5, 3, EnemyType.Random));
+            enemies.Add(new Enemy(width - 3, height - 3, 4, EnemyType.Smart));
+            enemies.Add(new Enemy(3, height - 4, 3, EnemyType.Chase));
         }
 
         public bool IsWall(int x, int y)
@@ -138,7 +140,7 @@ namespace bomb
                     var blast = bombs[i].Explode();
 
                     blasts.AddRange(blast);
-                    blastTimer =   5;
+                    blastTimer = 5;
 
                     foreach (var p in blast)
                     {
@@ -151,7 +153,12 @@ namespace bomb
                         if (Player.X == p.X && Player.Y == p.Y)
                             Player.Kill();
 
-                        enemies.RemoveAll(e => e.X == p.X && e.Y == p.Y);
+                        // ★ 敵死亡処理 + エフェクト追加
+                        if (enemies.Any(e => e.X == p.X && e.Y == p.Y))
+                        {
+                            deathEffects.Add((new Point(p.X, p.Y), 8));
+                            enemies.RemoveAll(e => e.X == p.X && e.Y == p.Y);
+                        }
                     }
 
                     bombs.RemoveAt(i);
@@ -173,8 +180,15 @@ namespace bomb
                     Player.Kill();
             }
 
-            if (enemies.Count == 0 && Player.IsAlive)
+            // ★ プレイヤーが死んでいたらゲームクリアを無効化
+            if (!Player.IsAlive)
+            {
+                isGameClear = false;
+            }
+            else if (enemies.Count == 0)
+            {
                 isGameClear = true;
+            }
         }
 
         public void Draw(Graphics g)
@@ -219,17 +233,41 @@ namespace bomb
 
             foreach (var p in blasts)
             {
-                // ★ 爆風の色をランダムに揺らす
-                int r = rand.Next(200, 256);   // 赤み強め
-                int g2 = rand.Next(150, 256);  // 黄色寄り
-                int b = rand.Next(0, 80);      // 青は弱め（炎っぽく）
+                int r = rand.Next(200, 256);
+                int g2 = rand.Next(150, 256);
+                int b = rand.Next(0, 80);
 
                 Brush blastBrush = new SolidBrush(Color.FromArgb(r, g2, b));
 
                 g.FillRectangle(blastBrush, p.X * cellSize, p.Y * cellSize, cellSize, cellSize);
             }
+
             foreach (var enemy in enemies)
                 enemy.Draw(g, cellSize);
+
+            // ★ 敵死亡エフェクト描画
+            for (int i = deathEffects.Count - 1; i >= 0; i--)
+            {
+                var (pos, timer) = deathEffects[i];
+
+                int r = rand.Next(200, 256);
+                int g2 = rand.Next(100, 200);
+                int b = rand.Next(0, 50);
+
+                Brush effectBrush = new SolidBrush(Color.FromArgb(r, g2, b));
+
+                g.FillEllipse(effectBrush,
+                    pos.X * cellSize + 5,
+                    pos.Y * cellSize + 5,
+                    cellSize - 10,
+                    cellSize - 10);
+
+                timer--;
+                deathEffects[i] = (pos, timer);
+
+                if (timer <= 0)
+                    deathEffects.RemoveAt(i);
+            }
 
             if (showStartMessage)
             {
