@@ -27,6 +27,11 @@ namespace bomb
         public Form1()
         {
             InitializeComponent();
+
+            // ★ フォームを画面の上の方に移動
+            this.StartPosition = FormStartPosition.Manual;
+            this.Location = new Point(200, 10); // ← X=100, Y=50 に表示
+
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.KeyDown += Form1_KeyDown;
