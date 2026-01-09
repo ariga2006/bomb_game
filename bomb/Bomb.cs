@@ -81,10 +81,26 @@ namespace bomb
             return blast;
         }
 
-        
+
         public void Draw(Graphics g, int cellSize)
         {
-            g.FillEllipse(Brushes.Red, X * cellSize, Y * cellSize, cellSize, cellSize);
+            // ★ 爆発が近づくほど点滅が速くなる
+            bool flash = (timer % 10 < 5);
+
+            Brush brush;
+
+            if (timer < 10)
+            {
+                // ★ 爆発直前は赤→白の高速点滅
+                brush = flash ? Brushes.White : Brushes.Orange;
+            }
+            else
+            {
+                // ★ 通常時は黒→赤のゆっくり点滅
+                brush = flash ? Brushes.OrangeRed : Brushes.Red;
+            }
+
+            g.FillEllipse(brush, X * cellSize, Y * cellSize, cellSize, cellSize);
         }
 
         // 爆風を描画（黄色）

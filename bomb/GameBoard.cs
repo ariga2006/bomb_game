@@ -138,7 +138,7 @@ namespace bomb
                     var blast = bombs[i].Explode();
 
                     blasts.AddRange(blast);
-                    blastTimer = 5;
+                    blastTimer =   5;
 
                     foreach (var p in blast)
                     {
@@ -218,8 +218,16 @@ namespace bomb
                 bomb.Draw(g, cellSize);
 
             foreach (var p in blasts)
-                g.FillRectangle(Brushes.Yellow, p.X * cellSize, p.Y * cellSize, cellSize, cellSize);
+            {
+                // ★ 爆風の色をランダムに揺らす
+                int r = rand.Next(200, 256);   // 赤み強め
+                int g2 = rand.Next(150, 256);  // 黄色寄り
+                int b = rand.Next(0, 80);      // 青は弱め（炎っぽく）
 
+                Brush blastBrush = new SolidBrush(Color.FromArgb(r, g2, b));
+
+                g.FillRectangle(blastBrush, p.X * cellSize, p.Y * cellSize, cellSize, cellSize);
+            }
             foreach (var enemy in enemies)
                 enemy.Draw(g, cellSize);
 
