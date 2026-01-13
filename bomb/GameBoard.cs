@@ -24,7 +24,10 @@ namespace bomb
 
         // ★ 追加：敵死亡エフェクト
         private List<(Point pos, int timer)> deathEffects = new List<(Point, int)>();
-
+        public void PlaceBombInternal(Player player)
+        {
+            bombs.Add(new Bomb(player.X, player.Y, map));
+        }
         public bool IsGameClear => isGameClear;
 
         private bool showStartMessage = false;
@@ -39,7 +42,7 @@ namespace bomb
             if (IsBomb(Player.X, Player.Y))
                 return;
 
-            bombs.Add(new Bomb(Player.X, Player.Y, map));
+            //bombs.Add(new Bomb(Player.X, Player.Y, map));
         }
 
         public bool IsBomb(int x, int y)
