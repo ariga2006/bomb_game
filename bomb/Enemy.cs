@@ -137,7 +137,7 @@ namespace bomb
                     break;
 
                 case EnemyType.Smart:
-                    brush = Brushes.Blue;    // スマート
+                    brush = Brushes.Purple;    // スマート
                     break;
 
                 default:

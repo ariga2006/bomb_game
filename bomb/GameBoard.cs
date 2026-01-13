@@ -33,6 +33,7 @@ namespace bomb
         private bool showStartMessage = false;
         private int startMessageTimer = 0;
 
+        //爆弾の制限
         public void PlaceBomb()
         {
             if (bombs.Count >= 5)
@@ -302,7 +303,7 @@ namespace bomb
                 float retryX = (map.GetLength(1) * cellSize - retrySize.Width) / 2;
                 float retryY = centerY + textSize.Height + 20;
 
-                g.DrawString(retryText, retryFont, Brushes.Blue, retryX, retryY);
+                g.DrawString(retryText, retryFont, Brushes.Green, retryX, retryY);
             }
 
             if (isGameClear)
@@ -314,7 +315,7 @@ namespace bomb
                 float centerX = (map.GetLength(1) * cellSize - textSize.Width) / 2;
                 float centerY = (map.GetLength(0) * cellSize - textSize.Height) / 2;
 
-                g.DrawString(text, font, Brushes.Green, centerX, centerY);
+                g.DrawString(text, font, Brushes.Yellow, centerX, centerY);
 
                 string retryText = "スペースキーで再挑戦！";
                 Font retryFont = new Font("Arial", 20, FontStyle.Bold);
@@ -323,7 +324,7 @@ namespace bomb
                 float retryX = (map.GetLength(1) * cellSize - retrySize.Width) / 2;
                 float retryY = centerY + textSize.Height + 20;
 
-                g.DrawString(retryText, retryFont, Brushes.Blue, retryX, retryY);
+                g.DrawString(retryText, retryFont, Brushes.Green, retryX, retryY);
             }
         }
     }
