@@ -30,6 +30,7 @@ namespace bomb
         private bool showStartMessage = false;
         private int startMessageTimer = 0;
 
+        //爆弾の制限
         public void PlaceBomb()
         {
             if (bombs.Count >= 5)
