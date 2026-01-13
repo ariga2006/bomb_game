@@ -45,6 +45,12 @@ namespace bomb
             //bombs.Add(new Bomb(Player.X, Player.Y, map));
         }
 
+        //敵の爆弾所持よう
+        public void PlaceEnemyBomb(int x, int y)
+        {
+            bombs.Add(new Bomb(x, y, map));
+        }
+
         public bool IsBomb(int x, int y)
         {
             foreach (var bomb in bombs)
@@ -193,6 +199,18 @@ namespace bomb
             {
                 isGameClear = true;
             }
+        }
+
+        //危険判定
+        public bool IsDanger(int x, int y)
+        {
+            foreach (var bomb in bombs)
+            {
+                var blast = bomb.PeekBlastArea();
+                if (blast.Any(p => p.X == x && p.Y == y))
+                    return true;
+            }
+            return false;
         }
 
         public void Draw(Graphics g)

@@ -29,6 +29,11 @@ namespace bomb
             return timer <= 0; // trueなら爆発終了
         }
 
+        public List<Point> PeekBlastArea()
+        {
+            return CalculateBlast(); // 爆発範囲を計算する内部メソッド
+        }
+
         // 爆発範囲を返す
         public List<Point> Explode(int range = 2)
         {
@@ -81,7 +86,51 @@ namespace bomb
             return blast;
         }
 
+        // ★ 爆発範囲だけを計算して返す（マップを壊さない）
+        private List<Point> CalculateBlast(int range = 2)
+        {
+            List<Point> blast = new List<Point>();
 
+            // 爆心地
+            blast.Add(new Point(X, Y));
+
+            int[][] dirs = new int[][]
+            {
+        new int[] { 1, 0 },   // 右
+        new int[] { -1, 0 },  // 左
+        new int[] { 0, 1 },   // 下
+        new int[] { 0, -1 }   // 上
+            };
+
+            foreach (var dir in dirs)
+            {
+                int dx = dir[0];
+                int dy = dir[1];
+
+                for (int i = 1; i <= range; i++)
+                {
+                    int nx = X + dx * i;
+                    int ny = Y + dy * i;
+
+                    // 範囲外
+                    if (nx < 0 || ny < 0 || nx >= map.GetLength(1) || ny >= map.GetLength(0))
+                        break;
+
+                    // 壊せない壁なら爆風ストップ
+                    if (map[ny, nx] == 1)
+                        break;
+
+                    // 爆風に追加
+                    blast.Add(new Point(nx, ny));
+
+                    // 壊せる壁は爆風に含めるが、壊さない（Explode と違うポイント）
+                    if (map[ny, nx] == 2)
+                        break;
+                }
+            }
+
+            return blast;
+        }
         public void Draw(Graphics g, int cellSize)
         {
             // ★ 爆発が近づくほど点滅が速くなる

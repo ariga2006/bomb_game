@@ -37,6 +37,12 @@ namespace bomb
 
         public void Update(GameBoard board)
         {
+            // 一定確率で爆弾を置く（例：3%）
+            if (CanPlaceBomb && rand.Next(100) < 3)
+            {
+                TryPlaceBomb(board);
+            }
+
             tickCounter++;
             if (tickCounter >= moveDelay)
             {
@@ -63,6 +69,19 @@ namespace bomb
             }
         }
 
+        public bool CanPlaceBomb = true;
+
+        //敵の爆弾所持
+        public void TryPlaceBomb(GameBoard board)
+        {
+            if (!CanPlaceBomb) return;
+
+            if (board.IsBomb(X, Y)) return;
+
+            board.PlaceEnemyBomb(X, Y);
+
+            CanPlaceBomb = false; // クールダウン（後で調整可能）
+        }
         // 1：ランダム移動
         private void MoveRandom(GameBoard board)
         {
@@ -116,11 +135,20 @@ namespace bomb
         // 5：ハイブリッド（60%追跡 / 40%ランダム）
         private void MoveSmart(GameBoard board)
         {
+            // ★ 爆発範囲にいるなら逃げる
+            if (board.IsDanger(X, Y))
+            {
+                MoveAwayFromDanger(board);
+                return;
+            }
+
             if (rand.Next(100) < 60)
                 MoveChase(board);   // 60% 追跡
             else
                 MoveRandom(board);  // 40% ランダム
         }
+
+
 
         public void Draw(Graphics g, int cellSize)
         {
@@ -146,6 +174,32 @@ namespace bomb
             }
 
             g.FillRectangle(brush, X * cellSize, Y * cellSize, cellSize, cellSize);
+        }
+
+        //敵が逃げるための判定
+        private void MoveAwayFromDanger(GameBoard board)
+        {
+            int[][] dirs = {
+        new int[]{1,0}, new int[]{-1,0},
+        new int[]{0,1}, new int[]{0,-1}
+    };
+
+            // ランダム順に試す
+            foreach (var d in dirs.OrderBy(x => rand.Next()))
+            {
+                int nx = X + d[0];
+                int ny = Y + d[1];
+
+                // 壁・爆弾・危険地帯を避ける
+                if (!board.IsWall(nx, ny) &&
+                    !board.IsBomb(nx, ny) &&
+                    !board.IsDanger(nx, ny))
+                {
+                    X = nx;
+                    Y = ny;
+                    return;
+                }
+            }
         }
     }
 }
