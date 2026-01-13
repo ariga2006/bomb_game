@@ -8,6 +8,7 @@ namespace bomb
         public int X { get; private set; }
         public int Y { get; private set; }
         public bool IsAlive { get; private set; } = true; // 生存フラグ
+        private DateTime lastBombTime = DateTime.MinValue; // 最後に爆弾を置いた時刻
 
         public Player(int startX = 1, int startY = 1) // ← デフォルトを (1,1) に
         {
@@ -36,6 +37,17 @@ namespace bomb
         {
             IsAlive = false;
         }
+        // ★ クールタイム付き爆弾設置
+        public void PlaceBomb(GameBoard board)
+        {
+            // 例: 800ms のクールタイム
+            if ((DateTime.Now - lastBombTime).TotalMilliseconds < 800)
+                return; // まだクールタイム中なら何もしない
+
+            lastBombTime = DateTime.Now;
+            board.PlaceBombInternal(this); // GameBoard 側の内部処理を呼ぶ
+        }
+
 
         public void Draw(Graphics g, int cellSize)
         {

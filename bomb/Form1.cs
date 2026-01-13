@@ -76,7 +76,9 @@ namespace bomb
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            
+            // board がまだ生成されていないなら何もしない
+            if (board == null) return;
+
             if (isGameEnded && e.KeyCode == Keys.Space)
             {
                 board = new GameBoard(21, 21);
@@ -89,6 +91,19 @@ namespace bomb
                 Invalidate();
                 return;
             }
+            //if (e.KeyCode == Keys.Space)
+            //{
+            //    board.Player.PlaceBomb(board); // ★ Player経由で呼ぶ
+            //}
+            if (e.KeyCode == Keys.Space)
+            {
+                if (e.KeyCode == Keys.Space)
+                {
+                    board.Player.PlaceBomb(board); // ← こちらを使う
+                }
+                board.Player.PlaceBomb(board); // ← こちらを使う
+            }
+
 
             if (board == null) return;
             if (isGameEnded) return;
@@ -129,6 +144,7 @@ namespace bomb
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
+
             if (board != null)
             {
                 board.Draw(e.Graphics);
