@@ -23,8 +23,8 @@ namespace bomb
         private Random rand = new Random();
         private int moveDelay;   // 移動間隔（Tick数）
         private int tickCounter; // Tickカウンタ
-       
-        private int bombCooldown = 180; // 爆弾を置く間隔
+
+        private int bombCooldown = 120; // 120tick は置けない
         private int bombTimer = 0;      // カウンタ
 
         public EnemyType Type { get; private set; }
@@ -38,14 +38,17 @@ namespace bomb
             Type = type;
         }
 
+
         public void Update(GameBoard board)
         {
-            //  一定間隔で爆弾を置く
             bombTimer++;
-            if (bombTimer >= bombCooldown)
+
+            // クールダウン終了 + 確率で爆弾
+            if (bombTimer >= bombCooldown && rand.Next(100) < 60)
             {
-                bombTimer = 0;
+                CanPlaceBomb = true;   // 次の爆弾を置けるようにする
                 TryPlaceBomb(board);
+                bombTimer = 0;
             }
 
             tickCounter++;
@@ -54,11 +57,17 @@ namespace bomb
                 tickCounter = 0;
                 Move(board);
             }
-
         }
 
         private void Move(GameBoard board)
         {
+            // ★ 爆弾の爆発範囲にいるなら、最優先で逃げる
+            if (board.IsDanger(X, Y))
+            {
+                MoveAwayFromDanger(board);
+                return;
+            }
+
             MoveRandom(board);   // ランダム移動
         }
 
@@ -87,6 +96,8 @@ namespace bomb
             int nx = X + d[0];
             int ny = Y + d[1];
 
+            
+
             if (!board.IsWall(nx, ny) && !board.IsBomb(nx, ny))
             {
                 X = nx;
@@ -102,24 +113,35 @@ namespace bomb
         new int[]{0,1}, new int[]{0,-1}
     };
 
-            // ランダム順に試す
-            foreach (var d in dirs.OrderBy(x => rand.Next()))
+            int bestScore = int.MinValue;
+            int bestX = X;
+            int bestY = Y;
+
+            foreach (var d in dirs)
             {
                 int nx = X + d[0];
                 int ny = Y + d[1];
 
-                // 壁・爆弾・危険地帯を避ける
-                if (!board.IsWall(nx, ny) &&
-                    !board.IsBomb(nx, ny) &&
-                    !board.IsDanger(nx, ny))
+                // 移動できない場所は除外
+                if (board.IsWall(nx, ny) || board.IsBomb(nx, ny))
+                    continue;
+
+                // ★ 安全度スコアを計算
+                int score = EvaluateSafety(board, nx, ny);
+
+                if (score > bestScore)
                 {
-                    X = nx;
-                    Y = ny;
-                    return;
+                    bestScore = score;
+                    bestX = nx;
+                    bestY = ny;
                 }
             }
+
+            // 最も安全な方向へ移動
+            X = bestX;
+            Y = bestY;
         }
-      
+
 
         public void Draw(Graphics g, int cellSize)
         {
@@ -146,7 +168,34 @@ namespace bomb
 
             g.FillRectangle(brush, X * cellSize, Y * cellSize, cellSize, cellSize);
         }
+        private int EvaluateSafety(GameBoard board, int x, int y)
+        {
+            int score = 0;
 
-       
+            // 危険地帯なら即アウト
+            if (board.IsDanger(x, y))
+                return -999;
+
+            // 爆弾に近いほど危険
+            if (board.IsBomb(x + 1, y)) score -= 50;
+            if (board.IsBomb(x - 1, y)) score -= 50;
+            if (board.IsBomb(x, y + 1)) score -= 50;
+            if (board.IsBomb(x, y - 1)) score -= 50;
+
+            // 壁に囲まれていると逃げにくい
+            int wallCount = 0;
+            if (board.IsWall(x + 1, y)) wallCount++;
+            if (board.IsWall(x - 1, y)) wallCount++;
+            if (board.IsWall(x, y + 1)) wallCount++;
+            if (board.IsWall(x, y - 1)) wallCount++;
+            score -= wallCount * 10;
+
+            // プレイヤーに近いと危険（好みで調整）
+            int distPlayer = Math.Abs(board.Player.X - x) + Math.Abs(board.Player.Y - y);
+            score += distPlayer * 2;
+
+            return score;
+        }
+
     }
 }
