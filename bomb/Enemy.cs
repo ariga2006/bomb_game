@@ -38,54 +38,59 @@ namespace bomb
             Type = type;
         }
 
-
+        private bool IsSafeToPlaceBomb(GameBoard board)
+        {
+            // 爆弾を置いた瞬間の自分の位置が爆発範囲に入るならNG
+            return !board.IsDanger(X, Y);
+        }
         public void Update(GameBoard board)
         {
             bombTimer++;
 
-            // ★ プレイヤーとの距離
             int dist = Math.Abs(board.Player.X - X) + Math.Abs(board.Player.Y - Y);
 
-            // ★ タイプごとの設定
-            int cooldown = 120;   // デフォルト
-            int baseChance = 5;   // デフォルト
-            int bonus = 0;
+            int cooldown = 120;
+            int baseChance = 5;
+
+            int typeBonus = 0;
+            int distBonus = 0;
 
             switch (Type)
             {
                 case EnemyType.Random:
-                    cooldown = 150;   // のんびり → 遅い
-                    baseChance = 5;   // ほぼ置かない
-                    if (dist <= 3) bonus = 10;
+                    cooldown = 150;
+                    baseChance = 5;
+                    if (dist <= 5) typeBonus = 10;//10%
                     break;
 
                 case EnemyType.Chase:
-                    cooldown = 100;   // ちょっと早い
-                    baseChance = 15;  // そこそこ置く
-                    if (dist <= 3) bonus = 25;
+                    cooldown = 100;
+                    baseChance = 15;
+                    if (dist <= 5) typeBonus = 25;//25%
                     break;
 
                 case EnemyType.Smart:
-                    cooldown = 60;    // かなり早い
-                    baseChance = 25;  // 積極的
-                    if (dist <= 3) bonus = 40;
+                    cooldown = 60;
+                    baseChance = 25;
+                    if (dist <= 5) typeBonus = 40;//40%
                     break;
             }
 
-            int finalChance = baseChance + bonus;
+            // 距離による追加ボーナス
+            if (dist <= 3) distBonus = 80;//+80%
+            else if (dist <= 5) distBonus = 60;//+60%
 
+            int finalChance = baseChance + typeBonus + distBonus;
 
-            if (dist <= 3) bonus = 45;   // 超近い → +45%
-            else if (dist <= 5) bonus = 30; // 近い → +15%
-            else bonus = 0;              // 遠い → 追加なし
-
-            
-            // クールダウン終了 + 確率で爆弾
+            // クールダウン + 確率
             if (bombTimer >= bombCooldown && rand.Next(100) < finalChance)
             {
-                CanPlaceBomb = true;   // ★ 復活させる
-                TryPlaceBomb(board);
-                bombTimer = 0;
+                if (IsSafeToPlaceBomb(board) && CanEscapeAfterPlacingBomb(board))
+                {
+                    CanPlaceBomb = true;
+                    TryPlaceBomb(board);
+                    bombTimer = 0;
+                }
             }
 
             tickCounter++;
@@ -115,19 +120,22 @@ namespace bomb
             // ★ 逃げ道がない → 爆弾で道を作る
             if (!HasEscapeRoute(board))
             {
-                CanPlaceBomb = true;
-                TryPlaceBomb(board);
+                // 逃げ道がない → 爆弾を置くと100%死ぬ
+                MoveAwayFromDanger(board);
                 return;
             }
 
             // ★ 壊せる壁しかない → 爆弾で壊す
+
             if (OnlyBreakableWallAround(board))
             {
-                CanPlaceBomb = true;
-                TryPlaceBomb(board);
+                if (IsSafeToPlaceBomb(board) && CanEscapeAfterPlacingBomb(board))
+                {
+                    CanPlaceBomb = true;
+                    TryPlaceBomb(board);
+                }
                 return;
             }
-
 
             // 通常行動
             MoveRandom(board);
@@ -154,7 +162,7 @@ namespace bomb
         private bool OnlyBreakableWallAround(GameBoard board)
         {
             int breakableCount = 0;
-            int totalCheck = 0;
+            int blockedCount = 0;
 
             int[][] dirs = {
         new int[]{1,0}, new int[]{-1,0},
@@ -166,17 +174,20 @@ namespace bomb
                 int nx = X + d[0];
                 int ny = Y + d[1];
 
-                totalCheck++;
+                // 通れる床がある → 壊す必要なし
+                if (!board.IsWall(nx, ny) && !board.IsBomb(nx, ny))
+                    return false;
+
+                // 壁 or 爆弾 → blocked
+                blockedCount++;
 
                 // 壊せる壁ならカウント
                 if (board.IsBreakableWall(nx, ny))
                     breakableCount++;
-                else if (!board.IsWall(nx, ny) && !board.IsBomb(nx, ny))
-                    return false; // 通れる道がある → 壊す必要なし
             }
 
-            // 全方向が壊せる壁 or 壁 or 爆弾 → 壊すしかない
-            return breakableCount >= 1;
+            // 4方向すべてが壁 or 爆弾 かつ 壊せる壁が1つ以上
+            return blockedCount == 4 && breakableCount >= 1;
         }
         private bool IsNearDanger(GameBoard board)
         {
@@ -216,12 +227,13 @@ namespace bomb
         public void TryPlaceBomb(GameBoard board)
         {
             if (!CanPlaceBomb) return;
-
             if (board.IsBomb(X, Y)) return;
 
             board.PlaceEnemyBomb(X, Y);
+            CanPlaceBomb = false;
 
-            CanPlaceBomb = false; // クールダウン（後で調整可能）
+            // ★ 爆弾を置いた瞬間に即逃げる
+            MoveAwayFromDanger(board);
         }
         // 1：ランダム移動
         private void MoveRandom(GameBoard board)
@@ -335,6 +347,79 @@ namespace bomb
 
             return score;
         }
+        private bool CanEscapeAfterPlacingBomb(GameBoard board)
+        {
+            int bombTime = 50; // ★ 爆弾の爆発までのtick（Bombクラスに合わせて調整）
+
+            Queue<(int x, int y, int dist)> q = new Queue<(int, int, int)>();
+            HashSet<(int, int)> visited = new HashSet<(int, int)>();
+
+            q.Enqueue((X, Y, 0));
+            visited.Add((X, Y));
+
+            int[][] dirs = {
+        new int[]{1,0}, new int[]{-1,0},
+        new int[]{0,1}, new int[]{0,-1}
+    };
+
+            while (q.Count > 0)
+            {
+                var (cx, cy, dist) = q.Dequeue();
+
+                // ★ 爆発までに安全地帯に到達できる
+                if (!board.IsDanger(cx, cy) && dist < bombTime)
+                    return true;
+
+                foreach (var d in dirs)
+                {
+                    int nx = cx + d[0];
+                    int ny = cy + d[1];
+
+                    if (nx < 0 || ny < 0 || nx >= board.Width || ny >= board.Height)
+                        continue;
+
+                    if (board.IsWall(nx, ny) || board.IsBomb(nx, ny))
+                        continue;
+
+                    if (visited.Contains((nx, ny)))
+                        continue;
+
+                    visited.Add((nx, ny));
+                    q.Enqueue((nx, ny, dist + 1));
+                }
+            }
+
+            return false; // 爆発までに安全地帯へ行けない
+        }
+        //    private void MoveChase(GameBoard board)
+        //    {
+        //        int dx = Math.Sign(board.Player.X - X);
+        //        int dy = Math.Sign(board.Player.Y - Y);
+
+        //        // X方向優先
+        //        if (!board.IsWall(X + dx, Y) && !board.IsBomb(X + dx, Y))
+        //        {
+        //            X += dx;
+        //            return;
+        //        }
+
+        //        // Y方向
+        //        if (!board.IsWall(X, Y + dy) && !board.IsBomb(X, Y + dy))
+        //        {
+        //            Y += dy;
+        //        }
+        //    }
+
+        //    private void MoveSmart(GameBoard board)
+        //    {
+        //        // 危険なら逃げる（Move() 側で処理済み）
+
+        //        // 60% 追跡、40% ランダム
+        //        if (rand.Next(100) < 60)
+        //            MoveChase(board);
+        //        else
+        //            MoveRandom(board);
+        //    }
 
     }
 }
