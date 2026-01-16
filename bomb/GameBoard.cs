@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Windows.Forms.VisualStyles;
 
 
 
@@ -21,6 +22,13 @@ namespace bomb
         private List<Point> blasts = new List<Point>();
         private int blastTimer = 0;
         private bool isGameClear = false;
+        public enum CellType
+        {
+            Empty,
+            SolidWall,      // 壊せない壁
+            BreakableWall,  // 壊せる壁
+            Bomb
+        }
 
         // ★ 追加：敵死亡エフェクト
         private List<(Point pos, int timer)> deathEffects = new List<(Point, int)>();
@@ -68,6 +76,17 @@ namespace bomb
             showStartMessage = true;
             startMessageTimer = 10;
         }
+
+
+        public bool IsBreakableWall(int x, int y)
+        {
+            // 範囲外は壊せない壁扱い
+            if (x < 0 || y < 0 || x >= Width || y >= Height)
+                return false;
+
+            return map[y, x] == 2; // 2 = BreakableWall
+        }
+
 
         public GameBoard(int width, int height)
         {

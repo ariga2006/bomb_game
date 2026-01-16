@@ -99,30 +99,113 @@ namespace bomb
 
         private void Move(GameBoard board)
         {
-            // ★ 爆発範囲にいる → 最優先で逃げる
+            // 爆発範囲にいる → 最優先で逃げる
             if (board.IsDanger(X, Y))
             {
                 MoveAwayFromDanger(board);
                 return;
             }
 
-            // ★ 爆弾の近くにいる → 危険なので逃げる
-            if (IsNearBomb(board))
+            // 爆発範囲に入りそう → 逃げる
+            if (IsNearDanger(board))
             {
                 MoveAwayFromDanger(board);
                 return;
             }
+            // ★ 逃げ道がない → 爆弾で道を作る
+            if (!HasEscapeRoute(board))
+            {
+                CanPlaceBomb = true;
+                TryPlaceBomb(board);
+                return;
+            }
+
+            // ★ 壊せる壁しかない → 爆弾で壊す
+            if (OnlyBreakableWallAround(board))
+            {
+                CanPlaceBomb = true;
+                TryPlaceBomb(board);
+                return;
+            }
+
 
             // 通常行動
             MoveRandom(board);
         }
-        private bool IsNearBomb(GameBoard board)
+        private bool HasEscapeRoute(GameBoard board)
         {
-            // 4方向に爆弾があるかチェック
-            if (board.IsBomb(X + 2, Y)) return true;
-            if (board.IsBomb(X - 2, Y)) return true;
-            if (board.IsBomb(X, Y + 2)) return true;
-            if (board.IsBomb(X, Y - 2)) return true;
+            int[][] dirs = {
+        new int[]{1,0}, new int[]{-1,0},
+        new int[]{0,1}, new int[]{0,-1}
+    };
+
+            foreach (var d in dirs)
+            {
+                int nx = X + d[0];
+                int ny = Y + d[1];
+
+                // 通れる場所があれば逃げ道あり
+                if (!board.IsWall(nx, ny) && !board.IsBomb(nx, ny))
+                    return true;
+            }
+
+            return false; // どこにも行けない
+        }
+        private bool OnlyBreakableWallAround(GameBoard board)
+        {
+            int breakableCount = 0;
+            int totalCheck = 0;
+
+            int[][] dirs = {
+        new int[]{1,0}, new int[]{-1,0},
+        new int[]{0,1}, new int[]{0,-1}
+    };
+
+            foreach (var d in dirs)
+            {
+                int nx = X + d[0];
+                int ny = Y + d[1];
+
+                totalCheck++;
+
+                // 壊せる壁ならカウント
+                if (board.IsBreakableWall(nx, ny))
+                    breakableCount++;
+                else if (!board.IsWall(nx, ny) && !board.IsBomb(nx, ny))
+                    return false; // 通れる道がある → 壊す必要なし
+            }
+
+            // 全方向が壊せる壁 or 壁 or 爆弾 → 壊すしかない
+            return breakableCount >= 1;
+        }
+        private bool IsNearDanger(GameBoard board)
+        {
+            // 爆弾の爆発範囲をチェック（十字方向）
+            int[][] dirs = {
+        new int[]{1,0}, new int[]{-1,0},
+        new int[]{0,1}, new int[]{0,-1}
+    };
+
+            foreach (var d in dirs)
+            {
+                int nx = X;
+                int ny = Y;
+
+                // 爆発範囲を最大3マスと仮定（必要なら board.BombPower を使う）
+                for (int i = 0; i < 3; i++)
+                {
+                    nx += d[0];
+                    ny += d[1];
+
+                    // 壁に当たったら爆発は止まる
+                    if (board.IsWall(nx, ny))
+                        break;
+
+                    // 爆弾があれば危険
+                    if (board.IsBomb(nx, ny))
+                        return true;
+                }
+            }
 
             return false;
         }
