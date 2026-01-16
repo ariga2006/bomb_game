@@ -24,7 +24,7 @@ namespace bomb
         private int moveDelay;   // 移動間隔（Tick数）
         private int tickCounter; // Tickカウンタ
 
-        private int bombCooldown = 120; // 120tick は置けない
+        private int bombCooldown = 100; // 100tick は置けない
         private int bombTimer = 0;      // カウンタ
 
         public EnemyType Type { get; private set; }
@@ -43,10 +43,47 @@ namespace bomb
         {
             bombTimer++;
 
-            // クールダウン終了 + 確率で爆弾
-            if (bombTimer >= bombCooldown && rand.Next(100) < 60)
+            // ★ プレイヤーとの距離
+            int dist = Math.Abs(board.Player.X - X) + Math.Abs(board.Player.Y - Y);
+
+            // ★ タイプごとの設定
+            int cooldown = 120;   // デフォルト
+            int baseChance = 5;   // デフォルト
+            int bonus = 0;
+
+            switch (Type)
             {
-                CanPlaceBomb = true;   // 次の爆弾を置けるようにする
+                case EnemyType.Random:
+                    cooldown = 150;   // のんびり → 遅い
+                    baseChance = 5;   // ほぼ置かない
+                    if (dist <= 3) bonus = 10;
+                    break;
+
+                case EnemyType.Chase:
+                    cooldown = 100;   // ちょっと早い
+                    baseChance = 15;  // そこそこ置く
+                    if (dist <= 3) bonus = 25;
+                    break;
+
+                case EnemyType.Smart:
+                    cooldown = 60;    // かなり早い
+                    baseChance = 25;  // 積極的
+                    if (dist <= 3) bonus = 40;
+                    break;
+            }
+
+            int finalChance = baseChance + bonus;
+
+
+            if (dist <= 3) bonus = 45;   // 超近い → +45%
+            else if (dist <= 5) bonus = 30; // 近い → +15%
+            else bonus = 0;              // 遠い → 追加なし
+
+            
+            // クールダウン終了 + 確率で爆弾
+            if (bombTimer >= bombCooldown && rand.Next(100) < finalChance)
+            {
+                CanPlaceBomb = true;   // ★ 復活させる
                 TryPlaceBomb(board);
                 bombTimer = 0;
             }
@@ -58,6 +95,7 @@ namespace bomb
                 Move(board);
             }
         }
+
 
         private void Move(GameBoard board)
         {
