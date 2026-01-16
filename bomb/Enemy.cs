@@ -140,21 +140,23 @@ namespace bomb
 
             CanPlaceBomb = false; // クールダウン（後で調整可能）
         }
+       
         // 1：ランダム移動
         private void MoveRandom(GameBoard board)
         {
             int[][] dirs = {
-                new int[]{1,0}, new int[]{-1,0},
-                new int[]{0,1}, new int[]{0,-1}
-            };
+        new int[]{1,0}, new int[]{-1,0},
+        new int[]{0,1}, new int[]{0,-1}
+    };
 
             var d = dirs[rand.Next(dirs.Length)];
             int nx = X + d[0];
             int ny = Y + d[1];
 
-            
-
-            if (!board.IsWall(nx, ny) && !board.IsBomb(nx, ny))
+            // 危険地帯には入らないようにする
+            if (!board.IsWall(nx, ny) &&
+                !board.IsBomb(nx, ny) &&
+                !board.IsDanger(nx, ny))
             {
                 X = nx;
                 Y = ny;
