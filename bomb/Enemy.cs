@@ -23,6 +23,9 @@ namespace bomb
         private Random rand = new Random();
         private int moveDelay;   // 移動間隔（Tick数）
         private int tickCounter; // Tickカウンタ
+       
+        private int bombCooldown = 180; // 爆弾を置く間隔
+        private int bombTimer = 0;      // カウンタ
 
         public EnemyType Type { get; private set; }
 
@@ -37,9 +40,11 @@ namespace bomb
 
         public void Update(GameBoard board)
         {
-            // 一定確率で爆弾を置く（例：3%）
-            if (CanPlaceBomb && rand.Next(100) < 3)
+            //  一定間隔で爆弾を置く
+            bombTimer++;
+            if (bombTimer >= bombCooldown)
             {
+                bombTimer = 0;
                 TryPlaceBomb(board);
             }
 
@@ -49,24 +54,12 @@ namespace bomb
                 tickCounter = 0;
                 Move(board);
             }
+
         }
 
         private void Move(GameBoard board)
         {
-            switch (Type)
-            {
-                case EnemyType.Random:
-                    MoveRandom(board);
-                    break;
-
-                case EnemyType.Chase:
-                    MoveChase(board);
-                    break;
-
-                case EnemyType.Smart:
-                    MoveSmart(board);
-                    break;
-            }
+            MoveRandom(board);   // ランダム移動
         }
 
         public bool CanPlaceBomb = true;
@@ -101,54 +94,32 @@ namespace bomb
             }
         }
 
-        // 2：プレイヤー追跡
-        private void MoveChase(GameBoard board)
+        //敵が逃げるための判定
+        private void MoveAwayFromDanger(GameBoard board)
         {
-            int dx = 0, dy = 0;
+            int[][] dirs = {
+        new int[]{1,0}, new int[]{-1,0},
+        new int[]{0,1}, new int[]{0,-1}
+    };
 
-            // ★ まず X 方向を優先して追う
-            if (board.Player.X > X) dx = 1;
-            else if (board.Player.X < X) dx = -1;
-
-            // X 方向に動けるなら動く
-            if (dx != 0)
+            // ランダム順に試す
+            foreach (var d in dirs.OrderBy(x => rand.Next()))
             {
-                int nx = X + dx;
-                if (!board.IsWall(nx, Y) && !board.IsBomb(nx, Y))
+                int nx = X + d[0];
+                int ny = Y + d[1];
+
+                // 壁・爆弾・危険地帯を避ける
+                if (!board.IsWall(nx, ny) &&
+                    !board.IsBomb(nx, ny) &&
+                    !board.IsDanger(nx, ny))
                 {
                     X = nx;
+                    Y = ny;
                     return;
                 }
             }
-
-            // ★ X が無理なら Y 方向を試す
-            if (board.Player.Y > Y) dy = 1;
-            else if (board.Player.Y < Y) dy = -1;
-
-            int ny2 = Y + dy;
-            if (!board.IsWall(X, ny2) && !board.IsBomb(X, ny2))
-            {
-                Y = ny2;
-            }
         }
-
-        // 5：ハイブリッド（60%追跡 / 40%ランダム）
-        private void MoveSmart(GameBoard board)
-        {
-            // ★ 爆発範囲にいるなら逃げる
-            if (board.IsDanger(X, Y))
-            {
-                MoveAwayFromDanger(board);
-                return;
-            }
-
-            if (rand.Next(100) < 60)
-                MoveChase(board);   // 60% 追跡
-            else
-                MoveRandom(board);  // 40% ランダム
-        }
-
-
+      
 
         public void Draw(Graphics g, int cellSize)
         {
@@ -176,30 +147,6 @@ namespace bomb
             g.FillRectangle(brush, X * cellSize, Y * cellSize, cellSize, cellSize);
         }
 
-        //敵が逃げるための判定
-        private void MoveAwayFromDanger(GameBoard board)
-        {
-            int[][] dirs = {
-        new int[]{1,0}, new int[]{-1,0},
-        new int[]{0,1}, new int[]{0,-1}
-    };
-
-            // ランダム順に試す
-            foreach (var d in dirs.OrderBy(x => rand.Next()))
-            {
-                int nx = X + d[0];
-                int ny = Y + d[1];
-
-                // 壁・爆弾・危険地帯を避ける
-                if (!board.IsWall(nx, ny) &&
-                    !board.IsBomb(nx, ny) &&
-                    !board.IsDanger(nx, ny))
-                {
-                    X = nx;
-                    Y = ny;
-                    return;
-                }
-            }
-        }
+       
     }
 }
