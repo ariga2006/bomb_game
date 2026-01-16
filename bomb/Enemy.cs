@@ -99,14 +99,32 @@ namespace bomb
 
         private void Move(GameBoard board)
         {
-            // ★ 爆弾の爆発範囲にいるなら、最優先で逃げる
+            // ★ 爆発範囲にいる → 最優先で逃げる
             if (board.IsDanger(X, Y))
             {
                 MoveAwayFromDanger(board);
                 return;
             }
 
-            MoveRandom(board);   // ランダム移動
+            // ★ 爆弾の近くにいる → 危険なので逃げる
+            if (IsNearBomb(board))
+            {
+                MoveAwayFromDanger(board);
+                return;
+            }
+
+            // 通常行動
+            MoveRandom(board);
+        }
+        private bool IsNearBomb(GameBoard board)
+        {
+            // 4方向に爆弾があるかチェック
+            if (board.IsBomb(X + 2, Y)) return true;
+            if (board.IsBomb(X - 2, Y)) return true;
+            if (board.IsBomb(X, Y + 2)) return true;
+            if (board.IsBomb(X, Y - 2)) return true;
+
+            return false;
         }
 
         public bool CanPlaceBomb = true;
