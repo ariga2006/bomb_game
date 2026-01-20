@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms.VisualStyles;
 
-
-
-
 namespace bomb
 {
     public class GameBoard
@@ -370,6 +367,11 @@ namespace bomb
                 float centerX = (map.GetLength(1) * cellSize - textSize.Width) / 2;
                 float centerY = (map.GetLength(0) * cellSize - textSize.Height) / 2;
 
+                // ★ 白い半透明背景
+                RectangleF bg = new RectangleF(centerX - 20, centerY - 20,
+                                               textSize.Width + 40, textSize.Height + 40);
+                g.FillRectangle(new SolidBrush(Color.FromArgb(200, 255, 255, 255)), bg);
+
                 g.DrawString(text, font, Brushes.Red, centerX, centerY);
 
                 string retryText = "スペースキーで再挑戦！";
@@ -378,6 +380,11 @@ namespace bomb
 
                 float retryX = (map.GetLength(1) * cellSize - retrySize.Width) / 2;
                 float retryY = centerY + textSize.Height + 20;
+
+                // ★ 再挑戦メッセージにも背景
+                RectangleF bg2 = new RectangleF(retryX - 20, retryY - 10,
+                                                retrySize.Width + 40, retrySize.Height + 20);
+                g.FillRectangle(new SolidBrush(Color.FromArgb(200, 255, 255, 255)), bg2);
 
                 g.DrawString(retryText, retryFont, Brushes.Green, retryX, retryY);
             }
@@ -391,6 +398,11 @@ namespace bomb
                 float centerX = (map.GetLength(1) * cellSize - textSize.Width) / 2;
                 float centerY = (map.GetLength(0) * cellSize - textSize.Height) / 2;
 
+                // ★ 白い半透明背景
+                RectangleF bg = new RectangleF(centerX - 20, centerY - 20,
+                                               textSize.Width + 40, textSize.Height + 40);
+                g.FillRectangle(new SolidBrush(Color.FromArgb(200, 255, 255, 255)), bg);
+
                 g.DrawString(text, font, Brushes.Yellow, centerX, centerY);
 
                 string retryText = "スペースキーで再挑戦！";
@@ -399,6 +411,11 @@ namespace bomb
 
                 float retryX = (map.GetLength(1) * cellSize - retrySize.Width) / 2;
                 float retryY = centerY + textSize.Height + 20;
+
+                // ★ 再挑戦メッセージにも背景
+                RectangleF bg2 = new RectangleF(retryX - 20, retryY - 10,
+                                                retrySize.Width + 40, retrySize.Height + 20);
+                g.FillRectangle(new SolidBrush(Color.FromArgb(200, 255, 255, 255)), bg2);
 
                 g.DrawString(retryText, retryFont, Brushes.Green, retryX, retryY);
             }
