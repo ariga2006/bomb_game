@@ -394,35 +394,8 @@ namespace bomb
 
             return false; // 爆発までに安全地帯へ行けない
         }
-        //    private void MoveChase(GameBoard board)
-        //    {
-        //        int dx = Math.Sign(board.Player.X - X);
-        //        int dy = Math.Sign(board.Player.Y - Y);
-
-        //        // X方向優先
-        //        if (!board.IsWall(X + dx, Y) && !board.IsBomb(X + dx, Y))
-        //        {
-        //            X += dx;
-        //            return;
-        //        }
-
-        //        // Y方向
-        //        if (!board.IsWall(X, Y + dy) && !board.IsBomb(X, Y + dy))
-        //        {
-        //            Y += dy;
-        //        }
-        //    }
-
-        //    private void MoveSmart(GameBoard board)
-        //    {
-        //        // 危険なら逃げる（Move() 側で処理済み）
-
-        //        // 60% 追跡、40% ランダム
-        //        if (rand.Next(100) < 60)
-        //            MoveChase(board);
-        //        else
-        //            MoveRandom(board);
-        //    }
+        
+       
 
     }
 }

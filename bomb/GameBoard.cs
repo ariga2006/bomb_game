@@ -180,8 +180,11 @@ namespace bomb
                         if (map[p.Y, p.X] == 2)
                             map[p.Y, p.X] = 0;
 
-                        if (Player.X == p.X && Player.Y == p.Y)
+                        // ★ クリア後は無敵
+                        if (!isGameClear && Player.X == p.X && Player.Y == p.Y)
+                        {
                             Player.Kill();
+                        }
 
                         // ★ 敵死亡処理 + エフェクト追加
                         if (enemies.Any(e => e.X == p.X && e.Y == p.Y))
