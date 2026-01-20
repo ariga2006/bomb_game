@@ -28,6 +28,7 @@ namespace bomb
         private int bombTimer = 0;      // カウンタ
 
         public EnemyType Type { get; private set; }
+        public bool DebugFreeze { get; internal set; }
 
         public Enemy(int startX, int startY, int speed, EnemyType type)
         {

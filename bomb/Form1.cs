@@ -20,7 +20,7 @@ namespace bomb
         private Button startButton;
         private Timer delayTimer;
         private bool isGameEnded = false;
-
+        public bool DebugFreeze { get; set; } = false;
         // ★追加：「最初の1回だけメッセージを出したか？」
         private bool hasShownStartMessage = false;
 
@@ -73,7 +73,11 @@ namespace bomb
 
             this.ClientSize = new Size(board.Width * 30, board.Height * 30);
         }
-
+        public void Update(GameBoard board)
+        {
+            if (DebugFreeze)
+                return;   // ★ デバッグ用：完全停止
+        }
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             // board がまだ生成されていないなら何もしない
@@ -123,6 +127,19 @@ namespace bomb
             if (e.KeyCode == Keys.Space) board.PlaceBomb();
 
             Invalidate();
+            if (e.KeyCode == Keys.T)   // Tで停止
+            {
+                foreach (var enemy in board.Enemies)
+                    enemy.DebugFreeze = true;
+            }
+
+            if (e.KeyCode == Keys.U)   // Uで再開
+            {
+                foreach (var enemy in board.Enemies)
+                    enemy.DebugFreeze = false;
+            }
+
+
         }
 
         private void GameTimer_Tick(object sender, EventArgs e)

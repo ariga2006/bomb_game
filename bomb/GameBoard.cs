@@ -16,6 +16,7 @@ namespace bomb
         public Player Player { get; private set; }
         private List<Bomb> bombs;
         private List<Enemy> enemies;
+        public List<Enemy> Enemies => enemies;
         private int[,] map;
         private int cellSize = 30;
         private Random rand = new Random();
@@ -203,7 +204,8 @@ namespace bomb
 
             foreach (var enemy in enemies)
             {
-                enemy.Update(this);
+                if (!enemy.DebugFreeze)      // ★ 追加：停止中なら Update を呼ばない
+                    enemy.Update(this);
 
                 if (enemy.X == Player.X && enemy.Y == Player.Y)
                     Player.Kill();
