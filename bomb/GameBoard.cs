@@ -223,14 +223,46 @@ namespace bomb
         //危険判定
         public bool IsDanger(int x, int y)
         {
+            // 既存の爆発中の Danger
+            foreach (var b in blasts)
+                if (b.X == x && b.Y == y)
+                    return true;
+
+            // ★ 爆発前の Danger（予兆）
             foreach (var bomb in bombs)
             {
-                var blast = bomb.PeekBlastArea();
-                if (blast.Any(p => p.X == x && p.Y == y))
+                // 爆弾の位置
+                if (bomb.X == x && bomb.Y == y)
                     return true;
+
+                // 爆発範囲（十字方向）
+                int[][] dirs = {
+            new int[]{1,0}, new int[]{-1,0},
+            new int[]{0,1}, new int[]{0,-1}
+        };
+
+                foreach (var d in dirs)
+                {
+                    int nx = bomb.X;
+                    int ny = bomb.Y;
+
+                    for (int i = 0; i < bomb.Power; i++)
+                    {
+                        nx += d[0];
+                        ny += d[1];
+
+                        if (IsWall(nx, ny))
+                            break;
+
+                        if (nx == x && ny == y)
+                            return true;
+                    }
+                }
             }
+
             return false;
         }
+
 
         public void Draw(Graphics g)
         {

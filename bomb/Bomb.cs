@@ -15,6 +15,7 @@ namespace bomb
         public int Y { get; private set; }
         private int timer = 20; // Tick回数で寿命管理
         private int[,] map;     // ★ マップを保持
+        public int Power { get; set; } = 3;  // ★ 追加：爆発範囲
 
         public Bomb(int x, int y, int[,] map)
         {
