@@ -210,10 +210,12 @@ namespace bomb
             }
 
             // ★ プレイヤーが死んでいたらゲームクリアを無効化
+            // ★ プレイヤーが死んだらゲームクリアは絶対に無効
             if (!Player.IsAlive)
             {
                 isGameClear = false;
             }
+            // ★ プレイヤーが生きていて、敵が0ならクリア
             else if (enemies.Count == 0)
             {
                 isGameClear = true;
